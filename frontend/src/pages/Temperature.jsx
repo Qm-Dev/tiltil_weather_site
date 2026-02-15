@@ -10,7 +10,9 @@ import DailyAvgTemperatureChart from '../components/temperature/DailyAvgTemperat
 import OverallTemperatureStats from '../components/temperature/OverallTemperatureStats.jsx';
 
 const Temperature = () => {
-  const { loading, yearly, monthly, daily, anniversary, hottestRecord, coldestRecord, latestRecord } = useTemperatureData();
+  const { loading, yearly, monthly, daily,
+          anniversary, hottestRecord, coldestRecord, latestRecord,
+          longestFrost, longestHeatwave, latestHeatwave, latestMaxMin } = useTemperatureData();
 
     if (loading) return (
       <LoadingTemperature />
@@ -19,7 +21,7 @@ const Temperature = () => {
     return (
       <div className="container text-center">
           <h1 className="mt-3 mb-3 fw-bold">Latest Recorded Stats</h1>
-          <LatestRecordedStats latestData={latestRecord} />
+          <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestMaxMin={latestMaxMin} />
           <div className="row justify-content-center">
             <h1 className="mt-3 fw-bold">Latest Temperature Compared To Previous Years</h1>
             <div className="col-12 mt-3">
@@ -40,8 +42,8 @@ const Temperature = () => {
             </div>
           </div>
           <h1 className="mt-3 mb-3 fw-bold">Overall Stats</h1>
-          <OverallTemperatureStats hottestRecord={hottestRecord} coldestRecord={coldestRecord} />
-      </div>
+          <OverallTemperatureStats hottestRecord={hottestRecord} coldestRecord={coldestRecord} longestFrost={longestFrost} longestHeatwave={longestHeatwave} />
+        </div>
 );
 }
 export default Temperature;

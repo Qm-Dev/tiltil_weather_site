@@ -142,6 +142,48 @@ def latest_temperature_record(db: Session = Depends(get_db)):
     """
     return crud.get_latest_record(db)
 
+@app.get("/temperature/latest_max_min", tags=["🌡️ Temperature"])
+def latest_max_min_temperature(db: Session = Depends(get_db)):
+    """
+    Returns the latest maximum and minimum temperature records from the day of the latest record.
+    """
+    return crud.get_latest_max_min(db)
+
+@app.get("/temperature/frosts", tags=["🌡️ Temperature"])
+def frost_periods(db: Session = Depends(get_db)):
+    """
+    Returns continuous periods of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during those periods.
+    """
+    return crud.get_frosts(db)
+
+@app.get("/temperature/frosts/longest", tags=["🌡️ Temperature"])
+def longest_frost_period(db: Session = Depends(get_db)):
+    """
+    Returns the longest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
+    """
+    return crud.get_longest_frost(db)
+
+@app.get("/temperature/heatwaves", tags=["🌡️ Temperature"])
+def heatwave_periods(db: Session = Depends(get_db)):
+    """
+    Returns continuous periods of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during those periods.
+    """
+    return crud.get_heatwaves(db)
+
+@app.get("/temperature/heatwaves/latest", tags=["🌡️ Temperature"])
+def latest_heatwave_period(db: Session = Depends(get_db)):
+    """
+    Returns the latest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
+    """
+    return crud.get_latest_heatwave(db)
+
+@app.get("/temperature/heatwaves/longest", tags=["🌡️ Temperature"])
+def longest_heatwave_period(db: Session = Depends(get_db)):
+    """
+    Returns the longest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
+    """
+    return crud.get_longest_heatwave(db)
+
 
 # =======================================================
 # Rainfall Endpoints
@@ -166,6 +208,7 @@ def rainy_days(db: Session = Depends(get_db)):
     Returns the rainy days (days with total rainfall greater than 2.5mm) from the weather records.
     """
     return crud.get_rainy_days(db)
+
 
 # =======================================================
 # Humidity Endpoints

@@ -81,7 +81,6 @@ def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Er
         return e.__class__.__name__
 
 
-
 # =======================================================
 # Temperature
 # =======================================================
@@ -225,6 +224,264 @@ def get_latest_record(db: Session):
                 LIMIT 1
                 """)
     return db.execute(query).mappings().first()
+
+
+def get_latest_max_min(db: Session):
+    query = text("""
+                WITH current_day AS (
+                    SELECT record_date::date::timestamp AS last_day
+                    FROM weather
+                    ORDER BY record_date DESC
+                    LIMIT 1
+                ),
+                this_day_max AS (
+                    SELECT
+                        w.record_date,
+                        MAX(w.hi_temp)
+                    FROM
+                        weather w
+                    CROSS JOIN current_day cd
+                    WHERE w.record_date >= cd.last_day AND w.record_date < (cd.last_day + INTERVAL '1 day')
+                    GROUP BY w.record_date
+                    ORDER BY max DESC, w.record_date DESC
+                    LIMIT 1
+                ),
+                this_day_min AS (
+                    SELECT
+                        w.record_date,
+                        MIN(w.low_temp)
+                    FROM
+                        weather w
+                    CROSS JOIN current_day cd
+                    WHERE w.record_date >= cd.last_day AND w.record_date < (cd.last_day + INTERVAL '1 day')
+                    GROUP BY w.record_date
+                    ORDER BY min ASC, w.record_date DESC
+                    LIMIT 1
+                )
+                SELECT
+                    this_day_max.record_date AS date_max,
+                    this_day_max.max AS max,
+                    this_day_min.record_date AS date_min,
+                    this_day_min.min AS min
+                FROM
+                    this_day_max
+                CROSS JOIN this_day_min
+            """)
+    return db.execute(query).mappings().first()
+
+
+def get_frosts(db: Session):
+    """
+    Identifies continuous periods of frost (low_temp <= 0) and obtains the start and end dates of those events, the duration and the minimum
+    temperature reached during that time frame. Only events that lasted 15 minutes or more are included.
+    """
+    query = text("""
+                WITH frost_markers AS (
+                    SELECT 
+                        record_date,
+                        low_temp,
+                        -- Check if current row is frost
+                        CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END AS is_frost,
+                        -- Check if the PREVIOUS row was frost
+                        LAG(CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                frost_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (frost to no-frost)
+                        -- 2. OR the gap between timestamps is > 1 hour
+                        SUM(CASE 
+                            WHEN is_frost != prev_is_frost THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM frost_markers
+                )
+                SELECT 
+                    MIN(record_date) AS frost_start,
+                    MAX(record_date) AS frost_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MIN(low_temp) AS min_temp_reached
+                FROM frost_islands
+                WHERE is_frost = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY frost_start ASC;
+                """)
+    return db.execute(query).mappings().all()
+
+
+def get_longest_frost(db: Session):
+    query = text("""
+                WITH frost_markers AS (
+                    SELECT 
+                        record_date,
+                        low_temp,
+                        -- Check if current row is frost
+                        CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END AS is_frost,
+                        -- Check if the PREVIOUS row was frost
+                        LAG(CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                frost_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (frost to no-frost)
+                        -- 2. OR the gap between timestamps is > 1 hour
+                        SUM(CASE 
+                            WHEN is_frost != prev_is_frost THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM frost_markers
+                )
+                SELECT 
+                    MIN(record_date) AS frost_start,
+                    MAX(record_date) AS frost_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MIN(low_temp) AS min_temp_reached
+                FROM frost_islands
+                WHERE is_frost = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY duration DESC
+                LIMIT 1;
+                 """)
+    return db.execute(query).mappings().first()
+
+
+def get_heatwaves(db: Session):
+    query = text("""
+                WITH heat_markers AS (
+                    SELECT 
+                        record_date,
+                        hi_temp,
+                        -- Check if current row meets heatwave threshold
+                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        -- Check if the PREVIOUS row was in a heatwave
+                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                heat_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (Hot -> Not Hot or vice versa)
+                        -- 2. OR there is a data gap larger than 1 hour
+                        SUM(CASE 
+                            WHEN is_heatwave != prev_is_heatwave THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM heat_markers
+                )
+                SELECT 
+                    MIN(record_date) AS heatwave_start,
+                    MAX(record_date) AS heatwave_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MAX(hi_temp) AS max_temp_reached
+                FROM heat_islands
+                WHERE is_heatwave = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY heatwave_start ASC;
+                """)
+    return db.execute(query).mappings().all()
+
+
+def get_latest_heatwave(db: Session):
+    query = text("""
+                WITH heat_markers AS (
+                    SELECT 
+                        record_date,
+                        hi_temp,
+                        -- Check if current row meets heatwave threshold
+                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        -- Check if the PREVIOUS row was in a heatwave
+                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                heat_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (Hot -> Not Hot or vice versa)
+                        -- 2. OR there is a data gap larger than 1 hour
+                        SUM(CASE 
+                            WHEN is_heatwave != prev_is_heatwave THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM heat_markers
+                )
+                SELECT 
+                    MIN(record_date) AS heatwave_start,
+                    MAX(record_date) AS heatwave_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MAX(hi_temp) AS max_temp_reached
+                FROM heat_islands
+                WHERE is_heatwave = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY heatwave_start DESC
+                LIMIT 1;
+                """)
+    return db.execute(query).mappings().first()
+
+
+def get_longest_heatwave(db: Session):
+    query = text("""
+                WITH heat_markers AS (
+                    SELECT 
+                        record_date,
+                        hi_temp,
+                        -- Check if current row meets heatwave threshold
+                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        -- Check if the PREVIOUS row was in a heatwave
+                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                heat_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (Hot -> Not Hot or vice versa)
+                        -- 2. OR there is a data gap larger than 1 hour
+                        SUM(CASE 
+                            WHEN is_heatwave != prev_is_heatwave THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM heat_markers
+                )
+                SELECT 
+                    MIN(record_date) AS heatwave_start,
+                    MAX(record_date) AS heatwave_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MAX(hi_temp) AS max_temp_reached
+                FROM heat_islands
+                WHERE is_heatwave = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY duration DESC
+                LIMIT 1;
+                """)
+    return db.execute(query).mappings().first()
+
+
 # =======================================================
 # Rainfall
 # =======================================================

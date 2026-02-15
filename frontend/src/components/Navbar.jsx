@@ -9,8 +9,8 @@ const Navbar = () => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="mx-xl-5 gap-xl-3 gap-1 navbar-nav text-center">
-                        <li className="nav-item disabled">
+                    <ul className="gap-xl-4 gap-md-3 gap-1 navbar-nav text-center w-100">
+                        <li className="nav-item">
                             <a className="nav-link text-white" href="/temperature">🌡️ Temperature</a>
                         </li>
                         <li className="nav-item">
@@ -24,6 +24,9 @@ const Navbar = () => {
                         </li>
                         <li className="nav-item">
                             <a className="nav-link disabled text-white" href="/pressure">📈 Pressure</a>
+                        </li>
+                        <li className="nav-item ms-lg-auto">
+                            <a className="nav-link disabled text-white" href="/login">👤 Login</a>
                         </li>
                     </ul>
                 </div>

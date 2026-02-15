@@ -124,3 +124,91 @@ export async function getLatestRecord() {
 
   return response.json();
 }
+
+export async function getLatestHeatwave() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/heatwaves/latest`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch latestheatwave data.");
+  }
+
+  return response.json();
+}
+
+export async function getLongestHeatwave() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/heatwaves/longest`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch longest heatwave period data.");
+  }
+  return response.json();
+}
+
+export async function getFrosts() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/frosts`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch frost data.");
+  }
+
+  return response.json();
+}
+
+export async function getLongestFrost() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/frosts/longest`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch longest frost period data.");
+  }
+
+  return response.json();
+}
+
+export async function getLatestMaxMin() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/latest_max_min`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch latest max and min temperature data.");
+  }
+
+  return response.json();
+}

@@ -6,7 +6,11 @@ import {
   getAnniversaryTimestampComparison,
   getHottestRecord,
   getColdestRecord,
-  getLatestRecord
+  getLatestRecord,
+  getLongestFrost,
+  getLongestHeatwave,
+  getLatestHeatwave,
+  getLatestMaxMin
 } from "../services/temperatureService";
 import { parseISO } from "date-fns";
 
@@ -20,7 +24,12 @@ export const useTemperatureData = () => {
 
   const [hottestRecord, setHottestRecord] = useState(null);
   const [coldestRecord, setColdestRecord] = useState(null);
+  
   const [latestRecord, setLatestRecord] = useState(null);
+  const [latestHeatwave, setLatestHeatwave] = useState(null);
+  const [longestFrost, setLongestFrost] = useState(null);
+  const [longestHeatwave, setLongestHeatwave] = useState(null);
+  const [latestMaxMin, setLatestMaxMin] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +80,38 @@ export const useTemperatureData = () => {
           min: latestRecordData.low_temp
         });
 
+        const latestHeatwaveData = await getLatestHeatwave();
+        setLatestHeatwave({
+          start: parseISO(latestHeatwaveData.heatwave_start).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          end: parseISO(latestHeatwaveData.heatwave_end).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          duration: latestHeatwaveData.duration,
+          max_temp_reached: latestHeatwaveData.max_temp_reached
+        });
+
+        const longestFrostData = await getLongestFrost();
+        setLongestFrost({
+          start: parseISO(longestFrostData.frost_start).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          end: parseISO(longestFrostData.frost_end).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          duration: longestFrostData.duration,
+          min_temp_reached: longestFrostData.min_temp_reached
+        });
+
+        const longestHeatwaveData = await getLongestHeatwave();
+        setLongestHeatwave({
+          start: parseISO(longestHeatwaveData.heatwave_start).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          end: parseISO(longestHeatwaveData.heatwave_end).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          duration: longestHeatwaveData.duration,
+          max_temp_reached: longestHeatwaveData.max_temp_reached
+        });
+
+        const latestMaxMinData = await getLatestMaxMin();
+        setLatestMaxMin({
+          date_max: parseISO(latestMaxMinData.date_max).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          max: latestMaxMinData.max,
+          date_min: parseISO(latestMaxMinData.date_min).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }),
+          min: latestMaxMinData.min
+        });
+
       } finally {
         setLoading(false);
       }
@@ -79,5 +120,5 @@ export const useTemperatureData = () => {
     load();
   }, []);
 
-  return { loading, yearly, monthly, daily, anniversary, hottestRecord, coldestRecord, latestRecord };
+  return { loading, yearly, monthly, daily, anniversary, hottestRecord, coldestRecord, latestRecord, longestFrost, longestHeatwave, latestHeatwave, latestMaxMin };
 };
