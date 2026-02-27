@@ -85,10 +85,13 @@ async def import_weather_records(db: Session = Depends(get_db), records_file: Up
 
     table_updated = crud.update_dataset_table(db, text)
 
-    if table_updated is not True:
-        raise HTTPException(status_code=500, detail=f"Failed to upload records into the database ({table_updated}).")
+    if table_updated["success"] is not True:
+        raise HTTPException(status_code=500, detail=f"Failed to upload records into the database ({table_updated['error']}).")
+    
+    if table_updated["inserted_count"] == 0:
+        raise HTTPException(status_code=200, detail="No new records were inserted into the database (all records in the file already exist in the database).")
 
-    raise HTTPException(status_code=201, detail="Weather records imported successfully into the database.")
+    raise HTTPException(status_code=201, detail=f"Weather records imported successfully into the database ({table_updated['inserted_count']} records inserted).")
 
 # =======================================================
 # Temperature Endpoints

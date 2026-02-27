@@ -74,11 +74,12 @@ def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Er
                             FROM weather_stage
                             ON CONFLICT DO NOTHING;
                             """)
+            inserted_count = cursor.rowcount
         db.commit()
-        return True
+        return {"success": True, "inserted_count": inserted_count}
     except psycopg.errors.Error as e:
         db.rollback()
-        return e.__class__.__name__
+        return {"success": False, "error": e.__class__.__name__}
 
 
 # =======================================================
