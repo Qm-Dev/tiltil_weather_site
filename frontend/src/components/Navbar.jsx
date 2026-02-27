@@ -14,7 +14,7 @@ const Navbar = () => {
                             <a className="nav-link text-white" href="/temperature">🌡️ Temperature</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/humidity">💧 Humidity</a>
+                            <a className="nav-link text-white" href="/humidity">💧 Humidity</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link disabled text-white" href="/rain">🌧️ Rain</a>

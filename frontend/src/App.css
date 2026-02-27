@@ -12,3 +12,32 @@
 .nav-item:hover {
     text-shadow: 2px 2px 1px black;
 }
+
+.bg_img_is_here {
+    position: relative;
+    background-size: 100% 100%;
+    background-position: center;
+}
+
+.bg_img_is_here::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.container {
+    position: relative;
+}
+
+.container h1 {
+    text-shadow: 3px 2px 2px white;
+    font-family: 'Inter', sans-serif;
+}
+
+.container h4, .container h2, .container h5 {
+    font-family: 'Oswald', sans-serif;
+}

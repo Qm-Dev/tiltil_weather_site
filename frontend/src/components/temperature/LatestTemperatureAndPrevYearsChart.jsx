@@ -1,6 +1,6 @@
 import LineChart from "../LineChart";
 
-export default function LatestTemperatureYearlyComparisonChart({data}) {
+export default function LatestTemperatureAndPrevYearsChart({data}) {
     return (
     <LineChart
     labels={data.labels}

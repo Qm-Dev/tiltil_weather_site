@@ -158,6 +158,30 @@ def get_temperature_by_year_month_day(db: Session):
     return db.execute(query).mappings().all()
 
 
+def get_last_week_temperatures(db: Session):
+    query = text("""
+                WITH last_week_stats AS (
+                    SELECT
+                        DATE(record_date) AS date,
+                        ROUND(AVG(avg_temp)::NUMERIC,1) AS avg_temp,
+                        MAX(hi_temp),
+                        MIN(low_temp)
+                    FROM
+                        weather
+                    GROUP BY
+                        date
+                    ORDER BY
+                        date DESC
+                    LIMIT 7
+                    OFFSET 1
+                )
+                SELECT *
+                FROM last_week_stats
+                ORDER BY date ASC
+                """)
+    return db.execute(query).mappings().all()
+
+
 def get_temperature_anniversary_timestamp_comparison(db: Session):
     query = text("""
                 WITH latest_record AS (
@@ -313,6 +337,48 @@ def get_frosts(db: Session):
                 ORDER BY frost_start ASC;
                 """)
     return db.execute(query).mappings().all()
+
+
+def get_latest_frost(db: Session):
+    query = text("""
+                WITH frost_markers AS (
+                    SELECT 
+                        record_date,
+                        low_temp,
+                        -- Check if current row meets frost threshold
+                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
+                        -- Check if the PREVIOUS row was in a frost
+                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        -- Check the time gap between rows
+                        LAG(record_date) OVER (ORDER BY record_date) AS prev_date
+                    FROM weather
+                ),
+                frost_islands AS (
+                    SELECT 
+                        *,
+                        -- Increment group ID if:
+                        -- 1. Status changed (frost -> no frost or vice versa)
+                        -- 2. OR there is a data gap larger than 1 hour
+                        SUM(CASE 
+                            WHEN is_frost != prev_is_frost THEN 1 
+                            WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
+                            ELSE 0 
+                        END) OVER (ORDER BY record_date) AS island_id
+                    FROM frost_markers
+                )
+                SELECT 
+                    MIN(record_date) AS frost_start,
+                    MAX(record_date) AS frost_end,
+                    MAX(record_date) - MIN(record_date) AS duration,
+                    MIN(low_temp) AS min_temp_reached
+                FROM frost_islands
+                WHERE is_frost = 1
+                GROUP BY island_id
+                HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
+                ORDER BY frost_start DESC
+                LIMIT 1;
+                """)
+    return db.execute(query).mappings().first()
 
 
 def get_longest_frost(db: Session):
@@ -537,15 +603,36 @@ def get_rainy_days(db: Session):
 # =======================================================
 def get_humidity_by_year(db: Session):
     query = text("""
-                SELECT
-                    TO_CHAR(record_date, 'YYYY') AS date,
-                    ROUND(AVG(out_hum)::NUMERIC,1) AS avg_humidity
+            WITH yearly_total_records AS (
+                SELECT   
+                    EXTRACT(YEAR FROM record_date) AS date,	
+                    COUNT(*) AS record_amount
                 FROM
                     weather
                 GROUP BY
                     date
                 ORDER BY
                     date ASC
+            ),
+            yearly_historical_hum AS (
+                SELECT
+                    EXTRACT(YEAR FROM record_date) AS date,
+                    ROUND(AVG(out_hum)::NUMERIC,1) AS avg_hum
+                FROM
+                    weather
+                GROUP BY
+                    date
+                ORDER BY
+                    date ASC
+            )
+            SELECT
+                yhh.date,
+                yhh.avg_hum
+            FROM
+                yearly_total_records ytr
+            LEFT JOIN
+                yearly_historical_hum yhh ON ytr.date = yhh.date
+            WHERE ytr.record_amount > 28000
                 """)
     return db.execute(query).mappings().all()
 

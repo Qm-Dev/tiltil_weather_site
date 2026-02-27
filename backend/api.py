@@ -114,6 +114,13 @@ def historical_daily_temperatures(db: Session = Depends(get_db)):
     """
     return crud.get_temperature_by_year_month_day(db)
 
+@app.get("/temperature/historic/last_week", tags=["🌡️ Temperature"])
+def historical_last_week_temperatures(db: Session = Depends(get_db)):
+    """
+    Returns the average, maximum, and minimum temperatures registered in the last 7 days from the weather records. Excludes the last day registered in the database.
+    """
+    return crud.get_last_week_temperatures(db)
+
 @app.get("/temperature/historic/anniversary_timestamp_comparison", tags=["🌡️ Temperature"])
 def temperature_anniversary_timestamp_comparison(db: Session = Depends(get_db)):
     """
@@ -155,6 +162,13 @@ def frost_periods(db: Session = Depends(get_db)):
     Returns continuous periods of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during those periods.
     """
     return crud.get_frosts(db)
+
+@app.get("/temperature/frosts/latest", tags=["🌡️ Temperature"])
+def latest_frost_period(db: Session = Depends(get_db)):
+    """
+    Returns the latest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
+    """
+    return crud.get_latest_frost(db)
 
 @app.get("/temperature/frosts/longest", tags=["🌡️ Temperature"])
 def longest_frost_period(db: Session = Depends(get_db)):

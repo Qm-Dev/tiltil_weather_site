@@ -52,6 +52,24 @@ export async function getDailyTemperature() {
   return response.json();
 }
 
+export async function getLastWeekTemperatures() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/last_week`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch last week temperature data.");
+  }
+  
+  return response.json();
+}
+
 export async function getAnniversaryTimestampComparison() {
   const response = await fetch(
     `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/anniversary_timestamp_comparison`,
@@ -172,6 +190,24 @@ export async function getFrosts() {
 
   if (!response.ok) {
     throw new Error("Failed to fetch frost data.");
+  }
+
+  return response.json();
+}
+
+export async function getLatestFrost() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/frosts/latest`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch latest frost period data.");
   }
 
   return response.json();

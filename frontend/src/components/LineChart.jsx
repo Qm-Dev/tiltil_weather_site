@@ -36,7 +36,7 @@ export default function LineChart({labels, datasets, title, x_label, y_label, is
   }, [labels, datasets, title, x_label, y_label, is_animated, is_legend_displayed]);
 
   return (
-  <div className="chart-container w-100 border border-black rounded-4 p-1" style={{ height: "450px" }}>
+  <div className="chart-container w-100 border border-2 border-black rounded-4 p-1" style={{ height: "450px", backgroundColor: "white" }}>
     <canvas className="my-4 w-100" ref={canvasRef} style={{ width:"100%", height:"100%" }}/>
   </div>
 );
