@@ -3,12 +3,13 @@ This is a weather forecast website based on historical data made available by a 
 
 # 📄 Installation
 
-## 📦 Containerized Tools
+## ⚙ Requirements
+* Python 3.14+
+* NodeJS 20.19+
+* PostgreSQL 18+
+> NodeJS 20.12+ may also be used, but we suggest using 20.19+ to prevent potential incompatibilities with Vite.
 
-### 🐳 Docker
-**TBD**
-
-### 🦭 Podman
+## 📦 Docker/Podman
 **TBD**
 
 ## 💻 Local
@@ -36,6 +37,7 @@ pip install -r backend/requirements.txt
 
 5. Install the dependencies in `frontend`
 ```bash
+cd frontend
 npm install
 ```
 
@@ -49,3 +51,4 @@ npm run dev
 ```bash
 uvicorn api:app
 ```
+> Head over to `/docs` to check the list of available endpoints.
