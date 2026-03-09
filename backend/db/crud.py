@@ -12,8 +12,7 @@ def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Er
         with conn.cursor() as cursor:
             cursor.execute("""
                             CREATE TABLE IF NOT EXISTS weather (
-                                id SERIAL,
-                                record_date TIMESTAMP UNIQUE,
+                                record_date TIMESTAMP PRIMARY KEY,
                                 avg_temp REAL,
                                 hi_temp REAL,
                                 low_temp REAL,
@@ -38,8 +37,7 @@ def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Er
                                 wind_samp INTEGER,
                                 wind_tx INTEGER,
                                 iss_recept REAL,
-                                arc_int SMALLINT,  
-                                PRIMARY KEY (id)
+                                arc_int SMALLINT
                             );""")
             cursor.execute("""
                             CREATE TEMP TABLE IF NOT EXISTS weather_stage AS
