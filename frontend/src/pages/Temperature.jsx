@@ -12,7 +12,7 @@ import OverallTemperatureStats from '../components/temperature/OverallTemperatur
 
 const Temperature = () => {
   const { loading, yearly, monthly, daily,
-          lastWeek, anniversary, hottestRecord, coldestRecord,
+          lastWeek, last30Days, anniversary, hottestRecord, coldestRecord,
           latestRecord, longestFrost, latestFrost, longestHeatwave,
           latestHeatwave, latestMaxMin } = useTemperatureData();
 
@@ -24,9 +24,9 @@ const Temperature = () => {
       <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
         <div className="container text-center">
             {/* Latest Recorded Stats */}
-            <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestFrost={latestFrost} latestMaxMin={latestMaxMin} lastWeekData={lastWeek} />
+            <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestFrost={latestFrost} latestMaxMin={latestMaxMin} lastWeekData={lastWeek} last30DaysData={last30Days} />
             <div className="row justify-content-center">
-              <h1 className="mt-3 fw-bold text-black">Previous Years Comparison</h1>
+              <h1 className="mt-3 fw-bold text-black">Current Temperature Compared To Previous Years</h1>
               <div className="col-12 mt-3">
                 <LatestTemperatureAndPrevYearsChart data={anniversary}/>
               </div>

@@ -70,6 +70,24 @@ export async function getLastWeekTemperatures() {
   return response.json();
 }
 
+export async function getLast30DaysTemperatures() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/last_30_days`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch last 30 days temperature data.");
+  }
+
+  return response.json();
+}
+
 export async function getAnniversaryTimestampComparison() {
   const response = await fetch(
     `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/anniversary_timestamp_comparison`,

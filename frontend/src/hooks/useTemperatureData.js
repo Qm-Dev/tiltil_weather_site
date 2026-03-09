@@ -4,6 +4,7 @@ import {
   getMonthlyTemperature,
   getDailyTemperature,
   getLastWeekTemperatures,
+  getLast30DaysTemperatures,
   getAnniversaryTimestampComparison,
   getHottestRecord,
   getColdestRecord,
@@ -22,6 +23,7 @@ export const useTemperatureData = () => {
   const [monthly, setMonthly] = useState({});
   const [daily, setDaily] = useState({});
   const [lastWeek, setLastWeek] = useState({});
+  const [last30Days, setLast30Days] = useState({});
   const [anniversary, setAnniversary] = useState({});
 
   const [hottestRecord, setHottestRecord] = useState(null);
@@ -61,6 +63,14 @@ export const useTemperatureData = () => {
           avg: lastWeekData.map(d => d.avg_temp),
           max: lastWeekData.map(d => d.max),
           min: lastWeekData.map(d => d.min)
+        });
+
+        const last30DaysData = await getLast30DaysTemperatures();
+        setLast30Days({
+          labels: last30DaysData.map(d => d.date),
+          avg: last30DaysData.map(d => d.avg_temp),
+          max: last30DaysData.map(d => d.max),
+          min: last30DaysData.map(d => d.min)
         });
 
         const anniversaryData = await getAnniversaryTimestampComparison();
@@ -139,5 +149,9 @@ export const useTemperatureData = () => {
     load();
   }, []);
 
-  return { loading, yearly, monthly, daily, lastWeek, anniversary, hottestRecord, coldestRecord, latestRecord, longestFrost, latestFrost, longestHeatwave, latestHeatwave, latestMaxMin };
+  return {
+    loading, yearly, monthly, daily, lastWeek,
+    last30Days, anniversary, hottestRecord, coldestRecord, latestRecord,
+    longestFrost, latestFrost, longestHeatwave, latestHeatwave, latestMaxMin
+  };
 };

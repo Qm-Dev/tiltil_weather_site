@@ -1,6 +1,6 @@
 import LineChart from "../LineChart";
 
-export default function LastWeekTemperatureChart({data}) {
+export default function LastPeriodTemperatureChart({data}) {
     return (
     <LineChart
     labels={data.labels}
@@ -27,7 +27,7 @@ export default function LastWeekTemperatureChart({data}) {
             pointRadius: 4,
         }
     ]}
-    title="Last Week Registered Temperatures"
+    title={`Last ${data.labels?.length} Days Registered Temperatures`}
     x_label="Date"
     y_label="Temperature (°C)"
     is_animated={true}

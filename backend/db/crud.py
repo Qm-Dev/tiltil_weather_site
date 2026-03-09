@@ -182,6 +182,29 @@ def get_last_week_temperatures(db: Session):
                 """)
     return db.execute(query).mappings().all()
 
+def get_last_30_days_temperatures(db: Session):
+    query = text("""
+                WITH last_week_stats AS (
+                    SELECT
+                        DATE(record_date) AS date,
+                        ROUND(AVG(avg_temp)::NUMERIC,1) AS avg_temp,
+                        MAX(hi_temp),
+                        MIN(low_temp)
+                    FROM
+                        weather
+                    GROUP BY
+                        date
+                    ORDER BY
+                        date DESC
+                    LIMIT 30
+                    OFFSET 1
+                )
+                SELECT *
+                FROM last_week_stats
+                ORDER BY date ASC
+                """)
+    return db.execute(query).mappings().all()
+
 
 def get_temperature_anniversary_timestamp_comparison(db: Session):
     query = text("""
@@ -297,7 +320,7 @@ def get_latest_max_min(db: Session):
 
 def get_frosts(db: Session):
     """
-    Identifies continuous periods of frost (low_temp <= 0) and obtains the start and end dates of those events, the duration and the minimum
+    Identifies continuous periods of frost (low_temp < 0) and obtains the start and end dates of those events, the duration and the minimum
     temperature reached during that time frame. Only events that lasted 15 minutes or more are included.
     """
     query = text("""
@@ -306,9 +329,9 @@ def get_frosts(db: Session):
                         record_date,
                         low_temp,
                         -- Check if current row is frost
-                        CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END AS is_frost,
+                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
                         -- Check if the PREVIOUS row was frost
-                        LAG(CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -389,9 +412,9 @@ def get_longest_frost(db: Session):
                         record_date,
                         low_temp,
                         -- Check if current row is frost
-                        CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END AS is_frost,
+                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
                         -- Check if the PREVIOUS row was frost
-                        LAG(CASE WHEN low_temp <= 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -431,9 +454,9 @@ def get_heatwaves(db: Session):
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -472,9 +495,9 @@ def get_latest_heatwave(db: Session):
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -514,9 +537,9 @@ def get_longest_heatwave(db: Session):
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 25 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather

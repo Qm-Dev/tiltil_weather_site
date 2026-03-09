@@ -42,8 +42,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_URL")],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"]
 )
 @app.get("/")
 async def root():
@@ -91,7 +91,9 @@ async def import_weather_records(db: Session = Depends(get_db), records_file: Up
     if table_updated["inserted_count"] == 0:
         raise HTTPException(status_code=200, detail="No new records were inserted into the database (all records in the file already exist in the database).")
 
-    raise HTTPException(status_code=201, detail=f"Weather records imported successfully into the database ({table_updated['inserted_count']} records inserted).")
+    return {"message": "Weather records imported successfully into the database.",
+            "inserted_count": table_updated["inserted_count"]
+    }
 
 # =======================================================
 # Temperature Endpoints
@@ -123,6 +125,13 @@ def historical_last_week_temperatures(db: Session = Depends(get_db)):
     Returns the average, maximum, and minimum temperatures registered in the last 7 days from the weather records. Excludes the last day registered in the database.
     """
     return crud.get_last_week_temperatures(db)
+
+@app.get("/temperature/historic/last_30_days", tags=["🌡️ Temperature"])
+def historical_last_30_days_temperatures(db: Session = Depends(get_db)):
+    """
+    Returns the average, maximum, and minimum temperatures registered in the last 30 days from the weather records. Excludes the last day registered in the database.
+    """
+    return crud.get_last_30_days_temperatures(db)
 
 @app.get("/temperature/historic/anniversary_timestamp_comparison", tags=["🌡️ Temperature"])
 def temperature_anniversary_timestamp_comparison(db: Session = Depends(get_db)):

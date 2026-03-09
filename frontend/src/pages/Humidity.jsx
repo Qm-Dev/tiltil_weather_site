@@ -16,8 +16,10 @@ const Humidity = () => {
 
     return (
         <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
-            <div className="container text-center">
-                <h1 className="fw-bold text-black">Humidity</h1>
+            <div className="container text-center mx-auto">
+                <div className="row justify-content-center mx-auto">
+                    <h1 className="fw-bold text-black mt-3 mb-3">Humidity</h1>
+                </div>
                 <div className="row justify-content-center">
                     <div className="col-12 col-xl-6">
                         <YearlyAvgHumidityChart data={yearly} />
