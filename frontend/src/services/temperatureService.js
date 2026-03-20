@@ -266,3 +266,39 @@ export async function getLatestMaxMin() {
 
   return response.json();
 }
+
+export async function getHotColdDaysLastWeekCount() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/hot_cold_days/last_week`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch hot and cold days count for last week.");
+  }
+
+  return response.json();
+}
+
+export async function getHotColdDaysLast30DaysCount() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/hot_cold_days/last_30_days`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch hot and cold days count for last 30 days.");
+  }
+
+  return response.json();
+}

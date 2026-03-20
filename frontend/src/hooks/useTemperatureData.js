@@ -13,7 +13,9 @@ import {
   getLongestHeatwave,
   getLatestHeatwave,
   getLatestFrost,
-  getLatestMaxMin
+  getLatestMaxMin,
+  getHotColdDaysLastWeekCount,
+  getHotColdDaysLast30DaysCount
 } from "../services/temperatureService";
 
 export const useTemperatureData = () => {
@@ -35,6 +37,9 @@ export const useTemperatureData = () => {
   const [longestFrost, setLongestFrost] = useState(null);
   const [longestHeatwave, setLongestHeatwave] = useState(null);
   const [latestMaxMin, setLatestMaxMin] = useState(null);
+
+  const [hotColdLastWeekCount, setHotColdLastWeekCount] = useState({ hot: 0, cold: 0 });
+  const [hotColdLast30DaysCount, setHotColdLast30DaysCount] = useState({ hot: 0, cold: 0 });
 
   useEffect(() => {
     const load = async () => {
@@ -141,6 +146,18 @@ export const useTemperatureData = () => {
           min: latestMaxMinData.min
         });
 
+        const hotColdLastWeekData = await getHotColdDaysLastWeekCount();
+        setHotColdLastWeekCount({
+          hot: hotColdLastWeekData.hot_days,
+          cold: hotColdLastWeekData.cold_days
+        });
+
+        const hotColdLast30DaysData = await getHotColdDaysLast30DaysCount();
+        setHotColdLast30DaysCount({
+          hot: hotColdLast30DaysData.hot_days,
+          cold: hotColdLast30DaysData.cold_days
+        });
+
       } finally {
         setLoading(false);
       }
@@ -152,6 +169,7 @@ export const useTemperatureData = () => {
   return {
     loading, yearly, monthly, daily, lastWeek,
     last30Days, anniversary, hottestRecord, coldestRecord, latestRecord,
-    longestFrost, latestFrost, longestHeatwave, latestHeatwave, latestMaxMin
+    longestFrost, latestFrost, longestHeatwave, latestHeatwave, latestMaxMin,
+    hotColdLastWeekCount, hotColdLast30DaysCount
   };
 };

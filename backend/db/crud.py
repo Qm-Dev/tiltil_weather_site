@@ -180,9 +180,10 @@ def get_last_week_temperatures(db: Session):
                 """)
     return db.execute(query).mappings().all()
 
+
 def get_last_30_days_temperatures(db: Session):
     query = text("""
-                WITH last_week_stats AS (
+                WITH last_30_days_stats AS (
                     SELECT
                         DATE(record_date) AS date,
                         ROUND(AVG(avg_temp)::NUMERIC,1) AS avg_temp,
@@ -198,10 +199,60 @@ def get_last_30_days_temperatures(db: Session):
                     OFFSET 1
                 )
                 SELECT *
-                FROM last_week_stats
+                FROM last_30_days_stats
                 ORDER BY date ASC
                 """)
     return db.execute(query).mappings().all()
+
+
+def get_amount_hot_cold_days_last_week(db: Session):
+    query = text("""
+                WITH last_week_stats AS (
+                    SELECT
+                        DATE(record_date) AS date,
+                        ROUND(AVG(avg_temp)::NUMERIC,1) AS avg_temp,
+                        MAX(hi_temp) AS max_temp,
+                        MIN(low_temp) AS min_temp
+                    FROM
+                        weather
+                    GROUP BY
+                        date
+                    ORDER BY
+                        date DESC
+                    LIMIT 7
+                    OFFSET 1
+                )
+                SELECT
+                    COUNT(*) FILTER (WHERE max_temp >= 33) AS hot_days,
+                    COUNT(*) FILTER (WHERE max_temp < 12) AS cold_days
+                FROM last_week_stats
+                """)
+    return db.execute(query).mappings().first()
+
+
+def get_amount_hot_cold_days_last_30_days(db: Session):
+    query = text("""
+                WITH last_30_days_stats AS (
+                    SELECT
+                        DATE(record_date) AS date,
+                        ROUND(AVG(avg_temp)::NUMERIC,1) AS avg_temp,
+                        MAX(hi_temp) AS max_temp,
+                        MIN(low_temp) AS min_temp
+                    FROM
+                        weather
+                    GROUP BY
+                        date
+                    ORDER BY
+                        date DESC
+                    LIMIT 30
+                    OFFSET 1
+                )
+                SELECT
+                    COUNT(*) FILTER (WHERE max_temp >= 33) AS hot_days,
+                    COUNT(*) FILTER (WHERE max_temp < 12) AS cold_days
+                FROM last_30_days_stats
+                """)
+    return db.execute(query).mappings().first()
 
 
 def get_temperature_anniversary_timestamp_comparison(db: Session):

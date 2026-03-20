@@ -210,6 +210,19 @@ def longest_heatwave_period(db: Session = Depends(get_db)):
     """
     return crud.get_longest_heatwave(db)
 
+@app.get("/temperature/hot_cold_days/last_week", tags=["🌡️ Temperature"])
+def hot_cold_days_last_week(db: Session = Depends(get_db)):
+    """
+    Returns the number of hot and cold days in the last 7 days from the weather records.
+    """
+    return crud.get_amount_hot_cold_days_last_week(db)
+
+@app.get("/temperature/hot_cold_days/last_30_days", tags=["🌡️ Temperature"])
+def hot_cold_days_last_30_days(db: Session = Depends(get_db)):
+    """
+    Returns the number of hot and cold days in the last 30 days from the weather records.
+    """
+    return crud.get_amount_hot_cold_days_last_30_days(db)
 
 # =======================================================
 # Rainfall Endpoints

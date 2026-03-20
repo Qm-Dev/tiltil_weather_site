@@ -10,9 +10,12 @@ import Fire from '../../assets/fire.svg';
 // Charts
 import LastPeriodTemperatureChart from './LastPeriodTemperatureChart';
 
+// Components
+import DaysHotCold from './DaysHotCold';
+
 import { parseISO } from "date-fns";
 
-export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, lastWeekData, last30DaysData}) {
+export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount}) {
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -88,8 +91,10 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
             </div>
             <h1 className="mt-3 mb-0 fw-bold text-black">Last Week Stats</h1>
             <LastPeriodTemperatureChart data={lastWeekData} />
+            <DaysHotCold hotColdCount={hotColdLastWeekCount} />
             <h1 className="mb-0 fw-bold text-black">Last 30 Days</h1>
             <LastPeriodTemperatureChart data={last30DaysData} />
+            <DaysHotCold hotColdCount={hotColdLast30DaysCount} />
         </div>
     );
 }
