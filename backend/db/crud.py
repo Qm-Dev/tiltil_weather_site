@@ -70,7 +70,7 @@ def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Er
                             )
                             SELECT *
                             FROM weather_stage
-                            ON CONFLICT DO NOTHING;
+                            ON CONFLICT (record_date) DO NOTHING;
                             """)
             inserted_count = cursor.rowcount
         db.commit()

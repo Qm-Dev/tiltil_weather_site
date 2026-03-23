@@ -25,5 +25,8 @@ build/
 # CSV
 *.csv
 
+# Text Files
+*.txt
+
 # Executables
 *.exe
