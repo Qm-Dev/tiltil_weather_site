@@ -1,3 +1,6 @@
+import { parseISO } from "date-fns";
+import { useState } from 'react';
+
 // Assets (.svg imports)
 import TemperatureHot from '../../assets/temperature-hot.svg';
 import TemperatureAverage from '../../assets/temperature-average.svg';
@@ -8,12 +11,10 @@ import Snowflake from '../../assets/snowflake.svg';
 import Fire from '../../assets/fire.svg';
 
 // Charts
-import LastPeriodTemperatureChart from './LastPeriodTemperatureChart';
+import LastPeriodTemperatureChart from './charts/LastPeriodTemperatureChart';
 
 // Components
 import DaysHotCold from './DaysHotCold';
-
-import { parseISO } from "date-fns";
 
 export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount}) {
 
@@ -25,6 +26,10 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
 
     const isRecentHeatwave = heatwaveEndDate && heatwaveEndDate >= thirtyDaysAgo;
     const isRecentFrost = frostEndDate && frostEndDate >= thirtyDaysAgo;
+
+    const [period, setPeriod] = useState("Last 7 Days");
+    const currentData = period === "Last 7 Days" ? lastWeekData : last30DaysData;
+    const currentCount = period === "Last 7 Days" ? hotColdLastWeekCount : hotColdLast30DaysCount;
 
 
     return (
@@ -89,12 +94,27 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 </>
                 )}
             </div>
-            <h1 className="mt-3 mb-0 fw-bold text-black">Last Week Stats</h1>
-            <LastPeriodTemperatureChart data={lastWeekData} />
-            <DaysHotCold hotColdCount={hotColdLastWeekCount} />
-            <h1 className="mb-0 fw-bold text-black">Last 30 Days</h1>
-            <LastPeriodTemperatureChart data={last30DaysData} />
-            <DaysHotCold hotColdCount={hotColdLast30DaysCount} />
+            <h1 className="mt-3 fw-bold text-black">Overview</h1>
+            <div className="dropdown">
+                <button className="btn dropdown-toggle fs-3 fw-bold text-black bg-transparent border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {period} Stats
+                </button>
+                <ul className="dropdown-menu">
+                    <li>
+                        <button className="dropdown-item" onClick={() => setPeriod('Last 7 Days')}>
+                            Last 7 Days
+                        </button>
+                    </li>
+                    <li>
+                        <button className="dropdown-item" onClick={() => setPeriod('Last 30 Days')}>
+                            Last 30 Days
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            {/* Dynamic Content */}
+            <LastPeriodTemperatureChart data={currentData} />
+            <DaysHotCold hotColdCount={currentCount} />
         </div>
     );
 }

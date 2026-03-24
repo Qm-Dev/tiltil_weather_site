@@ -1,6 +1,6 @@
-import LineChart from "../LineChart";
+import LineChart from "../../LineChart";
 
-export default function DailyAvgTemperatureChart({data}) {
+export default function YearlyAvgTemperatureChart({data}) {
     return (
         <LineChart
         labels={data.labels}
@@ -13,9 +13,10 @@ export default function DailyAvgTemperatureChart({data}) {
             pointRadius: 4,
             },
         ]}
-        title="Daily Average Temperature (2008-2026)"
-        x_label="Day"
+        title={`Yearly Average Temperature (2008-${data.labels.at(-1)})`}
+        x_label="Year"
         y_label="Temperature (°C)"
+        is_animated={true}
         />
     );
 }

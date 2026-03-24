@@ -1,4 +1,4 @@
-import LineChart from "../LineChart";
+import LineChart from "../../LineChart";
 
 export default function MonthlyAvgTemperatureChart({data}) {
     return (
@@ -13,7 +13,7 @@ export default function MonthlyAvgTemperatureChart({data}) {
             pointRadius: 4,
             },
         ]}
-        title="Monthly Average Temperature (2008-2026)"
+        title={`Monthly Average Temperature (2008-${data.labels.at(-1).slice(0,4)})`}
         x_label="Month"
         y_label="Temperature (°C)"
         is_animated={true}
