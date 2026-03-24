@@ -1,6 +1,6 @@
 import LineChart from "../../LineChart";
 
-export default function YearlyAvgTemperatureChart({data}) {
+export default function AvgTempEvolutionChart({data, x_label}) {
     return (
         <LineChart
         labels={data.labels}
@@ -13,8 +13,8 @@ export default function YearlyAvgTemperatureChart({data}) {
             pointRadius: 4,
             },
         ]}
-        title={`Yearly Average Temperature (2008-${data.labels.at(-1)})`}
-        x_label="Year"
+        title={`Average Temperature (2008-${String(data.labels.at(-1)).slice(0,4)})`}
+        x_label={x_label}
         y_label="Temperature (°C)"
         is_animated={true}
         />

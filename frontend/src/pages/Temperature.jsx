@@ -1,18 +1,12 @@
-import { useState } from 'react';
-
 // Hooks
 import { useTemperatureData } from '../hooks/useTemperatureData.js';
 
 // Components
-import {
-  DailyAvgTemperatureChart,
-  MonthlyAvgTemperatureChart,
-  YearlyAvgTemperatureChart,
-  LatestTemperatureAndPrevYearsChart
-} from '../components/temperature/charts';
+import { LatestTemperatureAndPrevYearsChart } from '../components/temperature/charts';
 import LoadingTemperature from '../components/temperature/LoadingTemperature.jsx';
 import LatestRecordedStats from '../components/temperature/LatestRecordedStats.jsx';
 import OverallTemperatureStats from '../components/temperature/OverallTemperatureStats.jsx';
+import TemperatureEvolution from '../components/temperature/TemperatureEvolution.jsx';
 
 const Temperature = () => {
   const { loading, yearly, monthly, daily, lastWeek,
@@ -35,19 +29,7 @@ const Temperature = () => {
               <LatestTemperatureAndPrevYearsChart data={anniversary}/>
             </div>
           </div>
-          <h1 className="mt-3 mb-3 fw-bold text-black">Temperature Evolution</h1>
-          {/* Avg Temperature Charts */}
-          <div className="row justify-content-center">
-            <div className="col-12 col-xl-6">
-              <YearlyAvgTemperatureChart data={yearly} />
-            </div>
-            <div className="col-12 col-xl-6 mt-3 mt-xl-0">
-              <MonthlyAvgTemperatureChart data={monthly} />
-            </div>
-            <div className="col-12 mt-3">
-              <DailyAvgTemperatureChart data={daily} />
-            </div>
-          </div>
+          <TemperatureEvolution yearly={yearly} monthly={monthly} daily={daily} />
           <h1 className="mt-3 mb-3 fw-bold text-black">Overall Stats</h1>
           <OverallTemperatureStats hottestRecord={hottestRecord} coldestRecord={coldestRecord} longestFrost={longestFrost} longestHeatwave={longestHeatwave} />
       </div>
