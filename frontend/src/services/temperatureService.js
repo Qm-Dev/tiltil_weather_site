@@ -52,6 +52,42 @@ export async function getDailyTemperature() {
   return response.json();
 }
 
+export async function getLast12HoursTemperatures() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/last_12_hours`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch last 12 hours temperature data.");
+  }
+
+  return response.json();
+}
+
+export async function getLast24HoursTemperatures() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/last_24_hours`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch last 24 hours temperature data.");
+  }
+
+  return response.json();
+}
+
 export async function getLastWeekTemperatures() {
   const response = await fetch(
     `${import.meta.env.VITE_API_BASE_URL}/temperature/historic/last_week`,

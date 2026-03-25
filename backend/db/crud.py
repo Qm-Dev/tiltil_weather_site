@@ -157,6 +157,50 @@ def get_temperature_by_year_month_day(db: Session):
     return db.execute(query).mappings().all()
 
 
+def get_last_12_hours_temperatures(db: Session):
+    query = text("""
+                WITH timestamps AS (
+                    SELECT
+                        record_date - INTERVAL '12 hours' AS begin_12hrs,
+                        record_date AS end_12hrs
+                    FROM weather
+                    ORDER BY record_date DESC
+                    LIMIT 1
+                ),
+                temps_last_12hrs AS (
+                    SELECT record_date AS date, avg_temp AS avg, hi_temp AS max, low_temp AS min
+                    FROM weather
+                    CROSS JOIN timestamps ts
+                    WHERE record_date >= ts.begin_12hrs AND record_date <= ts.end_12hrs
+                    ORDER BY record_date DESC
+                )
+                SELECT * FROM temps_last_12hrs ORDER BY date ASC
+                """)
+    return db.execute(query).mappings().all()
+
+
+def get_last_24_hours_temperatures(db: Session):
+    query = text("""
+                WITH timestamps AS (
+                    SELECT
+                        record_date - INTERVAL '1 day' AS begin_24hrs,
+                        record_date AS end_24hrs
+                    FROM weather
+                    ORDER BY record_date DESC
+                    LIMIT 1
+                ),
+                temps_last_24hrs AS (
+                    SELECT record_date AS date, avg_temp AS avg, hi_temp AS max, low_temp AS min
+                    FROM weather
+                    CROSS JOIN timestamps ts
+                    WHERE record_date >= ts.begin_24hrs AND record_date <= ts.end_24hrs
+                    ORDER BY record_date DESC
+                )
+                SELECT * FROM temps_last_24hrs ORDER BY date ASC
+                """)
+    return db.execute(query).mappings().all()
+
+
 def get_last_week_temperatures(db: Session):
     query = text("""
                 WITH last_week_stats AS (
@@ -326,10 +370,8 @@ def get_latest_record(db: Session):
 def get_latest_max_min(db: Session):
     query = text("""
                 WITH current_day AS (
-                    SELECT record_date::date::timestamp AS last_day
+                    SELECT MAX(record_date)::date AS last_day
                     FROM weather
-                    ORDER BY record_date DESC
-                    LIMIT 1
                 ),
                 this_day_max AS (
                     SELECT
@@ -340,7 +382,7 @@ def get_latest_max_min(db: Session):
                     CROSS JOIN current_day cd
                     WHERE w.record_date >= cd.last_day AND w.record_date < (cd.last_day + INTERVAL '1 day')
                     GROUP BY w.record_date
-                    ORDER BY max DESC, w.record_date DESC
+                    ORDER BY max DESC, w.record_date ASC
                     LIMIT 1
                 ),
                 this_day_min AS (
@@ -352,7 +394,7 @@ def get_latest_max_min(db: Session):
                     CROSS JOIN current_day cd
                     WHERE w.record_date >= cd.last_day AND w.record_date < (cd.last_day + INTERVAL '1 day')
                     GROUP BY w.record_date
-                    ORDER BY min ASC, w.record_date DESC
+                    ORDER BY min ASC, w.record_date ASC
                     LIMIT 1
                 )
                 SELECT

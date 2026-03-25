@@ -1,9 +1,11 @@
 import LineChart from "../../LineChart";
 
-export default function LastPeriodTemperatureChart({data}) {
+export default function LastPeriodHoursTemperatureChart({data, period}) {
     return (
     <LineChart
-    labels={data.labels}
+    labels={data.labels?.map(label => {
+        return label.split('T')[1]
+    })}
     datasets={[
         {
             label: "Average Temperature (°C)",
@@ -27,7 +29,7 @@ export default function LastPeriodTemperatureChart({data}) {
             pointRadius: 4,
         }
     ]}
-    title={`Last ${data.labels?.length} Days Registered Temperatures`}
+    title={`Registered Temperatures (${period})`}
     x_label="Date"
     y_label="Temperature (°C)"
     is_animated={true}

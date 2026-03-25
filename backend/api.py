@@ -119,6 +119,20 @@ def historical_daily_temperatures(db: Session = Depends(get_db)):
     """
     return crud.get_temperature_by_year_month_day(db)
 
+@app.get("/temperature/historic/last_12_hours", tags=["🌡️ Temperature"])
+def historical_last_12_hours_temperatures(db: Session = Depends(get_db)):
+    """
+    Returns the average, maximum, and minimum temperatures registered in the last 12 hours from the weather records.
+    """
+    return crud.get_last_12_hours_temperatures(db)
+
+@app.get("/temperature/historic/last_24_hours", tags=["🌡️ Temperature"])
+def historical_last_24_hours_temperatures(db: Session = Depends(get_db)):
+    """
+    Returns the average, maximum, and minimum temperatures registered in the last 24 hours from the weather records.
+    """
+    return crud.get_last_24_hours_temperatures(db)
+
 @app.get("/temperature/historic/last_week", tags=["🌡️ Temperature"])
 def historical_last_week_temperatures(db: Session = Depends(get_db)):
     """

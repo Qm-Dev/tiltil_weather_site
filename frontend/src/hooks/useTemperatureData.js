@@ -3,6 +3,8 @@ import {
   getYearlyTemperature,
   getMonthlyTemperature,
   getDailyTemperature,
+  getLast12HoursTemperatures,
+  getLast24HoursTemperatures,
   getLastWeekTemperatures,
   getLast30DaysTemperatures,
   getAnniversaryTimestampComparison,
@@ -24,13 +26,15 @@ export const useTemperatureData = () => {
   const [yearly, setYearly] = useState({});
   const [monthly, setMonthly] = useState({});
   const [daily, setDaily] = useState({});
+
+  const [last12Hours, setLast12Hours] = useState({});
+  const [last24Hours, setLast24Hours] = useState({});
   const [lastWeek, setLastWeek] = useState({});
   const [last30Days, setLast30Days] = useState({});
   const [anniversary, setAnniversary] = useState({});
 
   const [hottestRecord, setHottestRecord] = useState(null);
   const [coldestRecord, setColdestRecord] = useState(null);
-  
   const [latestRecord, setLatestRecord] = useState(null);
   const [latestHeatwave, setLatestHeatwave] = useState(null);
   const [latestFrost, setLatestFrost] = useState(null);
@@ -60,6 +64,22 @@ export const useTemperatureData = () => {
         setDaily({
           labels: dailyData.map(d => d.date),
           values: dailyData.map(d => d.avg_temp)
+        });
+
+        const last12HoursData = await getLast12HoursTemperatures();
+        setLast12Hours({
+          labels: last12HoursData.map(d => d.date),
+          avg: last12HoursData.map(d => d.avg),
+          max: last12HoursData.map(d => d.max),
+          min: last12HoursData.map(d => d.min)
+        });
+
+        const last24HoursData = await getLast24HoursTemperatures();
+        setLast24Hours({
+          labels: last24HoursData.map(d => d.date),
+          avg: last24HoursData.map(d => d.avg),
+          max: last24HoursData.map(d => d.max),
+          min: last24HoursData.map(d => d.min)
         });
 
         const lastWeekData = await getLastWeekTemperatures();
@@ -167,9 +187,9 @@ export const useTemperatureData = () => {
   }, []);
 
   return {
-    loading, yearly, monthly, daily, lastWeek,
-    last30Days, anniversary, hottestRecord, coldestRecord, latestRecord,
-    longestFrost, latestFrost, longestHeatwave, latestHeatwave, latestMaxMin,
-    hotColdLastWeekCount, hotColdLast30DaysCount
+    loading, yearly, monthly, daily, last12Hours, last24Hours,
+    lastWeek, last30Days, anniversary, hottestRecord, coldestRecord,
+    latestRecord, longestFrost, latestFrost, longestHeatwave, latestHeatwave,
+    latestMaxMin, hotColdLastWeekCount, hotColdLast30DaysCount
   };
 };

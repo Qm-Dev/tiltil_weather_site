@@ -11,12 +11,12 @@ import Snowflake from '../../assets/snowflake.svg';
 import Fire from '../../assets/fire.svg';
 
 // Charts
-import LastPeriodTemperatureChart from './charts/LastPeriodTemperatureChart';
+import { LastPeriodHoursTemperatureChart, LastPeriodDaysTemperatureChart } from "./charts";
 
 // Components
 import DaysHotCold from './DaysHotCold';
 
-export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount}) {
+export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, last12HoursData, last24HoursData, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount}) {
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -28,9 +28,13 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
     const isRecentFrost = frostEndDate && frostEndDate >= thirtyDaysAgo;
 
     const [period, setPeriod] = useState("Last 7 Days");
-    const currentData = period === "Last 7 Days" ? lastWeekData : last30DaysData;
-    const currentCount = period === "Last 7 Days" ? hotColdLastWeekCount : hotColdLast30DaysCount;
-
+    const currentData = {
+        "Last 12 Hours": last12HoursData,
+        "Last 24 Hours": last24HoursData,
+        "Last 7 Days": lastWeekData,
+        "Last 30 Days": last30DaysData
+    }[period];
+    const currentCount = period === "Last 30 Days" ? hotColdLast30DaysCount : hotColdLastWeekCount;
 
     return (
         <div className="row justify-content-center w-75 gap-3 mx-auto">
@@ -62,6 +66,7 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 <h4>{latestMaxMin?.min} °C</h4>
                 <h5>{parseISO(latestMaxMin?.date_min).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false })}</h5>
             </div>
+            <h3 className="fw-bold text-black">Temperature Range: {(latestMaxMin?.max - latestMaxMin?.min).toFixed(1)} °C</h3>
             <div className="col-12 col-sm-4 border border-2 border-black rounded-3" style={{backgroundColor: '#fc8e34', color: '#0F0F0F'}}>
                 <img src={Heatwave} alt="Heatwave" className="mt-1 w-25" />
                 {isRecentHeatwave  ? (
@@ -101,6 +106,16 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 </button>
                 <ul className="dropdown-menu">
                     <li>
+                        <button className="dropdown-item" onClick={() => setPeriod('Last 12 Hours')}>
+                            Last 12 Hours
+                        </button>
+                    </li>
+                    <li>
+                        <button className="dropdown-item" onClick={() => setPeriod('Last 24 Hours')}>
+                            Last 24 Hours
+                        </button>
+                    </li>
+                    <li>
                         <button className="dropdown-item" onClick={() => setPeriod('Last 7 Days')}>
                             Last 7 Days
                         </button>
@@ -113,8 +128,14 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 </ul>
             </div>
             {/* Dynamic Content */}
-            <LastPeriodTemperatureChart data={currentData} />
-            <DaysHotCold hotColdCount={currentCount} />
+            {period === "Last 24 Hours" || period === "Last 12 Hours" ? (
+                <LastPeriodHoursTemperatureChart data={currentData} period={period} />
+            ) : (
+                <>
+                    <LastPeriodDaysTemperatureChart data={currentData} period={period} />
+                    <DaysHotCold hotColdCount={currentCount} />
+                </>
+            )}
         </div>
     );
 }

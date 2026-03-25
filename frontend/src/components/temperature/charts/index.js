@@ -1,3 +1,4 @@
 export { default as AvgTempEvolutionChart } from './AvgTempEvolutionChart';
-export { default as LastPeriodTemperatureChart } from './LastPeriodTemperatureChart';
+export { default as LastPeriodHoursTemperatureChart } from './LastPeriodHoursTemperatureChart';
+export { default as LastPeriodDaysTemperatureChart } from './LastPeriodDaysTemperatureChart';
 export { default as LatestTemperatureAndPrevYearsChart } from './LatestTemperatureAndPrevYearsChart';
