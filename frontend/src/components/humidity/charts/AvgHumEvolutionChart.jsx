@@ -1,10 +1,10 @@
-import LineChart from "../LineChart";
+import LineChart from "../../LineChart";
 
-export default function MonthlyAvgHumidityChart({data}) {
+export default function AvgHumEvolutionChart({data, x_label}) {
     return (
         <LineChart
-        labels = {data.labels}
-        datasets = {[
+        labels={data.labels}
+        datasets={[
             {
             label: "Humidity (%)",
             borderColor: "rgb(61, 219, 61)",
@@ -13,8 +13,8 @@ export default function MonthlyAvgHumidityChart({data}) {
             pointRadius: 4,
             },
         ]}
-        title={`Monthly Average Humidity (2008-2026)`}
-        x_label="Month"
+        title={`Average Humidity (2008-${String(data.labels.at(-1)).slice(0,4)})`}
+        x_label={x_label}
         y_label="Humidity (%)"
         is_animated={true}
         />

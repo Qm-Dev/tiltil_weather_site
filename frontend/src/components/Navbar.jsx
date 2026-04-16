@@ -15,7 +15,7 @@ const Navbar = () => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="gap-xl-5 gap-md-3 gap-2 navbar-nav text-center w-100">
+                    <ul className="gap-xl-5 gap-md-3 gap-2 navbar-nav text-center w-100 fw-semibold">
                         <li className="nav-item">
                             <a className="nav-link text-white" href="/temperature"><img src={thermometer} alt="Temperature" style={{ height: '20px', marginRight: '5px' }} /> Temperature</a>
                         </li>

@@ -17,7 +17,8 @@ import {
   getLatestFrost,
   getLatestMaxMin,
   getHotColdDaysLastWeekCount,
-  getHotColdDaysLast30DaysCount
+  getHotColdDaysLast30DaysCount,
+  getTemperatureMovingAvg
 } from "../services/temperatureService";
 
 export const useTemperatureData = () => {
@@ -44,6 +45,8 @@ export const useTemperatureData = () => {
 
   const [hotColdLastWeekCount, setHotColdLastWeekCount] = useState({ hot: 0, cold: 0 });
   const [hotColdLast30DaysCount, setHotColdLast30DaysCount] = useState({ hot: 0, cold: 0 });
+
+  const [movingAvgLast30Days, setMovingAvgLast30Days] = useState({});
 
   useEffect(() => {
     const load = async () => {
@@ -178,6 +181,13 @@ export const useTemperatureData = () => {
           cold: hotColdLast30DaysData.cold_days
         });
 
+        const movingAvgLast30DaysData = await getTemperatureMovingAvg();
+        setMovingAvgLast30Days({
+          labels: movingAvgLast30DaysData.map(d => d.date),
+          daily_avg: movingAvgLast30DaysData.map(d => d.daily_avg),
+          moving_avg: movingAvgLast30DaysData.map(d => d.moving_avg)
+        });
+
       } finally {
         setLoading(false);
       }
@@ -190,6 +200,6 @@ export const useTemperatureData = () => {
     loading, yearly, monthly, daily, last12Hours, last24Hours,
     lastWeek, last30Days, anniversary, hottestRecord, coldestRecord,
     latestRecord, longestFrost, latestFrost, longestHeatwave, latestHeatwave,
-    latestMaxMin, hotColdLastWeekCount, hotColdLast30DaysCount
+    latestMaxMin, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days
   };
 };

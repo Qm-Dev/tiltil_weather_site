@@ -338,3 +338,21 @@ export async function getHotColdDaysLast30DaysCount() {
 
   return response.json();
 }
+
+export async function getTemperatureMovingAvg() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/temperature/moving_average`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch temperature moving average data.");
+  }
+
+  return response.json();
+}

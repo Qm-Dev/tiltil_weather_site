@@ -11,12 +11,12 @@ import Snowflake from '../../assets/snowflake.svg';
 import Fire from '../../assets/fire.svg';
 
 // Charts
-import { LastPeriodHoursTemperatureChart, LastPeriodDaysTemperatureChart } from "./charts";
+import { LastPeriodHoursTemperatureChart, LastPeriodDaysTemperatureChart, MovingAvgChart } from "./charts";
 
 // Components
 import DaysHotCold from './DaysHotCold';
 
-export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, last12HoursData, last24HoursData, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount}) {
+export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, last12HoursData, last24HoursData, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days}) {
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -66,7 +66,7 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 <h4>{latestMaxMin?.min} °C</h4>
                 <h5>{parseISO(latestMaxMin?.date_min).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false })}</h5>
             </div>
-            <h3 className="fw-bold text-black">Temperature Range: {(latestMaxMin?.max - latestMaxMin?.min).toFixed(1)} °C</h3>
+            <h3 className="fw-bold text-black">Today's Temperature Range: {(latestMaxMin?.max - latestMaxMin?.min).toFixed(1)} °C</h3>
             <div className="col-12 col-sm-4 border border-2 border-black rounded-3" style={{backgroundColor: '#fc8e34', color: '#0F0F0F'}}>
                 <img src={Heatwave} alt="Heatwave" className="mt-1 w-25" />
                 {isRecentHeatwave  ? (
@@ -136,6 +136,8 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                     <DaysHotCold hotColdCount={currentCount} />
                 </>
             )}
+            <h1 className="mt-3 fw-bold text-black">Moving Averages</h1>
+            <MovingAvgChart data={movingAvgLast30Days} />
         </div>
     );
 }

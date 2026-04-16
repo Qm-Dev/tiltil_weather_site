@@ -18,8 +18,8 @@ tags_metadata = [
         "description": "Operations related to rainfall data.",
     },
     {
-        "name": "💧 Humidity",
-        "description": "Operations related to humidity data.",
+        "name": "💧 Humidity & Dew Point",
+        "description": "Operations related to humidity and dew point data.",
     },
     {
         "name": "🤖 Machine Learning",
@@ -238,6 +238,14 @@ def hot_cold_days_last_30_days(db: Session = Depends(get_db)):
     """
     return crud.get_amount_hot_cold_days_last_30_days(db)
 
+@app.get("/temperature/moving_average", tags=["🌡️ Temperature"])
+def temperature_moving_average(db: Session = Depends(get_db)):
+    """
+    Returns the simple moving average temperature for the last 30 days from the weather records. Window size of 7 days.
+    The moving average is calculated inside the database with the help of Window Functions.
+    """
+    return crud.get_temperature_moving_avg_7_days(db)
+
 # =======================================================
 # Rainfall Endpoints
 # =======================================================
@@ -266,23 +274,44 @@ def rainy_days(db: Session = Depends(get_db)):
 # =======================================================
 # Humidity Endpoints
 # =======================================================
-@app.get("/humidity/historic/yearly", tags=["💧 Humidity"])
+@app.get("/humidity/historic/yearly", tags=["💧 Humidity & Dew Point"])
 def historical_yearly_average_humidity(db: Session = Depends(get_db)):
     """
     Returns the average humidity grouped by each year (ascending order) from the weather records.
     """
     return crud.get_humidity_by_year(db)
 
-@app.get("/humidity/historic/monthly", tags=["💧 Humidity"])
+@app.get("/humidity/historic/monthly", tags=["💧 Humidity & Dew Point"])
 def historical_monthly_average_humidity(db: Session = Depends(get_db)):
     """
     Returns the average humidity grouped by each year and month (ascending order) from the weather records.
     """
     return crud.get_humidity_by_year_month(db)
 
-@app.get("/humidity/historic/daily", tags=["💧 Humidity"])
+@app.get("/humidity/historic/daily", tags=["💧 Humidity & Dew Point"])
 def historical_daily_average_humidity(db: Session = Depends(get_db)):
     """
     Returns the average humidity grouped by each year, month, and day (ascending order) from the weather records.
     """
     return crud.get_humidity_by_year_month_day(db)
+
+@app.get("/humidity/historic/last_24_hours", tags=["💧 Humidity & Dew Point"])
+def historical_humidity_last_24_hours(db: Session = Depends(get_db)):
+    """
+    Returns the average humidity for the last 24 hours from the weather records.
+    """
+    return crud.get_humidity_last_24_hours(db)
+
+@app.get("/humidity/latest_record", tags=["💧 Humidity & Dew Point"])
+def latest_humidity_record(db: Session = Depends(get_db)):
+    """
+    Returns the latest humidity record from the weather records.
+    """
+    return crud.get_humidity_latest_record(db)
+
+@app.get("/humidity/latest_max_min", tags=["💧 Humidity & Dew Point"])
+def latest_humidity_max_min(db: Session = Depends(get_db)):
+    """
+    Returns the latest maximum and minimum humidity records (i.e the most recent day) from the weather records.
+    """
+    return crud.get_humidity_latest_max_min(db)

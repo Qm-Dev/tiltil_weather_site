@@ -30,7 +30,7 @@ export default function LastPeriodHoursTemperatureChart({data, period}) {
         }
     ]}
     title={`Registered Temperatures (${period})`}
-    x_label="Date"
+    x_label="Time (HH:MM:SS)"
     y_label="Temperature (°C)"
     is_animated={true}
     is_legend_displayed={true}

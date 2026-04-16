@@ -28,7 +28,7 @@ export default function LastPeriodDaysTemperatureChart({data, period}) {
         }
     ]}
     title={`Registered Temperatures (${period})`}
-    x_label="Date"
+    x_label="Year, Month & Day"
     y_label="Temperature (°C)"
     is_animated={true}
     is_legend_displayed={true}

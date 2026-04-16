@@ -3,12 +3,12 @@ import { useHumidityData } from '../hooks/useHumidityData.js';
 
 // Components
 import LoadingHumidity from '../components/humidity/LoadingHumidity.jsx';
-import YearlyAvgHumidityChart from '../components/humidity/YearlyAvgHumidityChart.jsx';
-import MonthlyAvgHumidityChart from '../components/humidity/MonthlyAvgHumidityChart.jsx';
+import HumidityEvolution from '../components/humidity/HumidityEvolution.jsx';
+import LatestRecordedStats from '../components/humidity/LatestRecordedStats.jsx';
 
 const Humidity = () => {
 
-    const { loading, yearly, monthly } = useHumidityData();
+    const { loading, yearly, monthly, daily, last24Hours, latestRecord, latestMaxMin } = useHumidityData();
 
     if (loading) return (
         <LoadingHumidity />
@@ -16,18 +16,9 @@ const Humidity = () => {
 
     return (
         <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
-            <div className="container text-center mx-auto">
-                <div className="row justify-content-center mx-auto">
-                    <h1 className="fw-bold text-black mt-3 mb-3">Humidity</h1>
-                </div>
-                <div className="row justify-content-center">
-                    <div className="col-12 col-xl-6">
-                        <YearlyAvgHumidityChart data={yearly} />
-                    </div>
-                    <div className="col-12 col-xl-6">
-                        <MonthlyAvgHumidityChart data={monthly} />
-                    </div>
-                </div>
+            <div className="container text-center justify-content-center">
+                <LatestRecordedStats latestRecord={latestRecord} latestMaxMin={latestMaxMin} last24Hours={last24Hours} />
+                <HumidityEvolution yearly_data={yearly} monthly_data={monthly} daily_data={daily} />
             </div>
         </main>
     );
