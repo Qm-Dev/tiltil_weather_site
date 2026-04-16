@@ -14,8 +14,8 @@ export default function MovingAvgChart({data}) {
         },
         {
         label: "Moving Avg. Temperature (°C)",
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgb(72, 86, 150)",
+        backgroundColor: "rgba(72, 86, 150, 0.5)",
         data: data.moving_avg,
         pointRadius: 4,
         }

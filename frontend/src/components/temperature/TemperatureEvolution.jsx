@@ -34,8 +34,8 @@ export default function TemperatureEvolution({ yearly, monthly, daily }) {
             <div className="row justify-content-center">
                 <div className="col-12">
                     {evolutionTimespan === "Yearly" && <AvgTempEvolutionChart data={currentData} x_label="Year" />}
-                    {evolutionTimespan === "Monthly" && <AvgTempEvolutionChart data={currentData} x_label="Year & Month" />}
-                    {evolutionTimespan === "Daily" && <AvgTempEvolutionChart data={currentData} x_label="Year, Month & Day" />}
+                    {evolutionTimespan === "Monthly" && <AvgTempEvolutionChart data={currentData} x_label="Year & Month (YYYY-MM)" />}
+                    {evolutionTimespan === "Daily" && <AvgTempEvolutionChart data={currentData} x_label="Year, Month & Day (YYYY-MM-DD)" />}
                 </div>
             </div>
         </>

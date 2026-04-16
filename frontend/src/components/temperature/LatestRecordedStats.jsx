@@ -27,7 +27,7 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
     const isRecentHeatwave = heatwaveEndDate && heatwaveEndDate >= thirtyDaysAgo;
     const isRecentFrost = frostEndDate && frostEndDate >= thirtyDaysAgo;
 
-    const [period, setPeriod] = useState("Last 7 Days");
+    const [period, setPeriod] = useState("Last 24 Hours");
     const currentData = {
         "Last 12 Hours": last12HoursData,
         "Last 24 Hours": last24HoursData,
