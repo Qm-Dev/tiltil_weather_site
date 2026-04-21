@@ -1,0 +1,1 @@
+export { default as TotalRainfall } from './TotalRainfall.jsx';

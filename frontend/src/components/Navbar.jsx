@@ -23,7 +23,7 @@ const Navbar = () => {
                             <a className="nav-link text-white" href="/humidity"><img src={droplet} alt="Humidity" style={{ height: '20px', marginRight: '5px' }} /> Humidity</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/rain"><img src={rain} alt="Rain" style={{ height: '20px', marginRight: '5px' }} /> Rain</a>
+                            <a className="nav-link text-white" href="/rain"><img src={rain} alt="Rain" style={{ height: '20px', marginRight: '5px' }} /> Rain</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link disabled text-white" href="/wind"><img src={wind} alt="Wind" style={{ height: '20px', marginRight: '5px' }} /> Wind</a>
