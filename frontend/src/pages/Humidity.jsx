@@ -2,7 +2,7 @@
 import { useHumidityData } from '../hooks/useHumidityData.js';
 
 // Components
-import LoadingHumidity from '../components/humidity/LoadingHumidity.jsx';
+import LoadingPage from '../components/LoadingPage.jsx';
 import HumidityEvolution from '../components/humidity/HumidityEvolution.jsx';
 import LatestRecordedStats from '../components/humidity/LatestRecordedStats.jsx';
 
@@ -11,7 +11,7 @@ const Humidity = () => {
     const { loading, yearly, monthly, daily, last24Hours, latestRecord, latestMaxMin } = useHumidityData();
 
     if (loading) return (
-        <LoadingHumidity />
+        <LoadingPage page={"Humidity"} />
     )
 
     return (

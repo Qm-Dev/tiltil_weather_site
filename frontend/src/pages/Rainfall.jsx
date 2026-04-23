@@ -2,7 +2,7 @@
 import { useRainfallData } from '../hooks/useRainfallData.js';
 
 // Components
-import LoadingRainfall from '../components/rainfall/LoadingRainfall.jsx';
+import LoadingPage from '../components/LoadingPage.jsx';
 import HistoricRainfall from '../components/rainfall/HistoricRainfall.jsx';
 
 const Rainfall = () => {
@@ -10,7 +10,7 @@ const Rainfall = () => {
     const { loading, yearly, monthly } = useRainfallData();
 
     if (loading) return (
-        <LoadingRainfall />
+        <LoadingPage page={"Rainfall"} />
     )
 
     return (

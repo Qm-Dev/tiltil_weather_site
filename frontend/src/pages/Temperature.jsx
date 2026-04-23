@@ -3,7 +3,7 @@ import { useTemperatureData } from '../hooks/useTemperatureData.js';
 
 // Components
 import { LatestTemperatureAndPrevYearsChart } from '../components/temperature/charts';
-import LoadingTemperature from '../components/temperature/LoadingTemperature.jsx';
+import LoadingPage from '../components/LoadingPage.jsx';
 import LatestRecordedStats from '../components/temperature/LatestRecordedStats.jsx';
 import OverallTemperatureStats from '../components/temperature/OverallTemperatureStats.jsx';
 import TemperatureEvolution from '../components/temperature/TemperatureEvolution.jsx';
@@ -15,7 +15,7 @@ const Temperature = () => {
           latestMaxMin, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days } = useTemperatureData();
 
   if (loading) return (
-    <LoadingTemperature />
+    <LoadingPage page={"Temperature"} />
   );
 
   return (
