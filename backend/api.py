@@ -26,8 +26,8 @@ tags_metadata = [
         "description": "Operations related to wind data.",
     },
     {
-        "name": "⚠️ Weather Risk",
-        "description": "Operations related to weather risk assessments.",
+        "name": "📈 Pressure",
+        "description": "Operations related to pressure data.",
     }
 ]
 
@@ -325,3 +325,13 @@ def latest_wind_record(db: Session = Depends(get_db)):
     Returns the latest wind record and their respective information.
     """
     return crud.get_latest_wind_stats(db)
+
+# =======================================================
+# Pressure Endpoints
+# =======================================================
+@app.get("/pressure/latest_record", tags=["📈 Pressure"])
+def latest_pressure_record(db: Session = Depends(get_db)):
+    """
+    Returns the latest pressure record with its respective information.
+    """
+    return crud.get_latest_pressure_record(db)

@@ -29,7 +29,7 @@ const Navbar = () => {
                             <a className="nav-link text-white" href="/wind"><img src={wind} alt="Wind" style={{ height: '20px', marginRight: '5px' }} /> Wind</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/pressure"><img src={pressure} alt="Pressure" style={{ height: '20px', marginRight: '5px' }} /> Pressure</a>
+                            <a className="nav-link text-white" href="/pressure"><img src={pressure} alt="Pressure" style={{ height: '20px', marginRight: '5px' }} /> Pressure</a>
                         </li>
                         <li className="nav-item ms-lg-auto">
                             <a className="nav-link disabled text-white" href="/login"><img src={login} alt="Login" style={{ height: '20px', marginRight: '5px' }} /> Login</a>

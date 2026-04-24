@@ -909,3 +909,19 @@ def get_latest_wind_stats(db: Session):
                 LIMIT 1
                 """)
     return db.execute(query).mappings().first()
+
+# =======================================================
+# Pressure
+# =======================================================
+
+def get_latest_pressure_record(db: Session):
+    query = text("""
+                SELECT
+                    record_date, bar
+                FROM
+                    weather
+                ORDER BY
+                    record_date DESC
+                LIMIT 1
+                """)
+    return db.execute(query).mappings().first()
