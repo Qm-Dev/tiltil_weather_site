@@ -6,7 +6,7 @@ export default function MovingAvgChart({data}) {
     labels={data.labels}
     datasets={[
         {
-        label: "Average Temperature (°C)",
+        label: "Avg. Temperature (°C)",
         borderColor: "rgb(219, 61, 61)",
         backgroundColor: "rgba(219, 61, 61, 0.5)",
         data: data.daily_avg,

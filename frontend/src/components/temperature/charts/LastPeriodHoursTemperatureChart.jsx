@@ -8,21 +8,21 @@ export default function LastPeriodHoursTemperatureChart({data, period}) {
     })}
     datasets={[
         {
-            label: "Average Temperature (°C)",
-            borderColor: "rgb(23, 33, 33)",
-            backgroundColor: "rgba(23, 33, 33, 0.5)",
+            label: "Avg. Temperature (°C)",
+            borderColor: "rgb(141, 59, 114)",
+            backgroundColor: "rgba(141, 59, 114, 0.5)",
             data: data.avg,
             pointRadius: 4,
         },
         {
-            label: "Max Temperature (°C)",
+            label: "Max. Temperature (°C)",
             borderColor: "rgb(219, 61, 61)",
             backgroundColor: "rgba(219, 61, 61, 0.5)",
             data: data.max,
             pointRadius: 4,
         },
         {
-            label: "Min Temperature (°C)",
+            label: "Min. Temperature (°C)",
             borderColor: "rgb(5, 142, 217)",
             backgroundColor: "rgba(5, 142, 217, 0.5)",
             data: data.min,

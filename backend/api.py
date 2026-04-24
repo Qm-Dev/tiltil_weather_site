@@ -22,8 +22,8 @@ tags_metadata = [
         "description": "Operations related to humidity and dew point data.",
     },
     {
-        "name": "🤖 Machine Learning",
-        "description": "Operations related to machine learning predictions.",
+        "name": "💨 Wind",
+        "description": "Operations related to wind data.",
     },
     {
         "name": "⚠️ Weather Risk",
@@ -315,3 +315,13 @@ def latest_humidity_max_min(db: Session = Depends(get_db)):
     Returns the latest maximum and minimum humidity records (i.e the most recent day) from the weather records.
     """
     return crud.get_humidity_latest_max_min(db)
+
+# =======================================================
+# Wind Endpoints
+# =======================================================
+@app.get("/wind/latest_record", tags=["💨 Wind"])
+def latest_wind_record(db: Session = Depends(get_db)):
+    """
+    Returns the latest wind record and their respective information.
+    """
+    return crud.get_latest_wind_stats(db)

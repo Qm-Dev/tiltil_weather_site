@@ -9,6 +9,7 @@ import Navbar from './components/Navbar.jsx'
 import Temperature from './pages/Temperature.jsx'
 import Humidity from './pages/Humidity.jsx';
 import Rainfall from './pages/Rainfall.jsx';
+import Wind from './pages/Wind.jsx';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <Route path="/temperature" element={<Temperature />} />
           <Route path="/humidity" element={<Humidity />} />
           <Route path="/rain" element={<Rainfall />} />
-          <Route path="/wind" element={<p>Not yet! The Wind page is under construction.</p>} />
+          <Route path="/wind" element={<Wind />} />
           <Route path="/pressure" element={<p>Not yet! The Pressure page is under construction.</p>} />
         </Routes>
       </BrowserRouter>

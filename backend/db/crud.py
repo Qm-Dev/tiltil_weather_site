@@ -892,3 +892,20 @@ def get_humidity_latest_max_min(db: Session):
                     today_min_hum
                 """)
     return db.execute(query).mappings().first()
+
+
+# =======================================================
+# Wind
+# =======================================================
+
+def get_latest_wind_stats(db: Session):
+    query = text("""
+                SELECT
+                    record_date, wind_speed, wind_direction, wind_run, hi_speed, hi_dir
+                FROM
+                    weather
+                ORDER BY
+                    record_date DESC
+                LIMIT 1
+                """)
+    return db.execute(query).mappings().first()
