@@ -21,3 +21,12 @@ node_modules
 # Builds
 dist/
 build/
+
+# CSV
+*.csv
+
+# Text Files
+*.txt
+
+# Executables
+*.exe

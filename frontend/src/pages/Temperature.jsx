@@ -1,47 +1,40 @@
+// Hooks
 import { useTemperatureData } from '../hooks/useTemperatureData.js';
 
 // Components
-import LoadingTemperature from '../components/temperature/LoadingTemperature.jsx';
+import { LatestTemperatureAndPrevYearsChart } from '../components/temperature/charts';
+import LoadingPage from '../components/LoadingPage.jsx';
 import LatestRecordedStats from '../components/temperature/LatestRecordedStats.jsx';
-import LatestTemperatureYearlyComparisonChart from '../components/temperature/LatestTemperatureYearlyComparisonChart.jsx';
-import YearlyAvgTemperatureChart from '../components/temperature/YearlyAvgTemperatureChart.jsx';
-import MonthlyAvgTemperatureChart from '../components/temperature/MonthlyAvgTemperatureChart.jsx';
-import DailyAvgTemperatureChart from '../components/temperature/DailyAvgTemperatureChart.jsx';
 import OverallTemperatureStats from '../components/temperature/OverallTemperatureStats.jsx';
+import TemperatureEvolution from '../components/temperature/TemperatureEvolution.jsx';
 
 const Temperature = () => {
-  const { loading, yearly, monthly, daily, anniversary, hottestRecord, coldestRecord, latestRecord } = useTemperatureData();
+  const { loading, yearly, monthly, daily, last12Hours, last24Hours,
+          lastWeek, last30Days, anniversary, hottestRecord, coldestRecord,
+          latestRecord, longestFrost, latestFrost, longestHeatwave, latestHeatwave,
+          latestMaxMin, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days } = useTemperatureData();
 
-    if (loading) return (
-      <LoadingTemperature />
-    );
+  if (loading) return (
+    <LoadingPage page={"Temperature"} />
+  );
 
-    return (
+  return (
+    <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
       <div className="container text-center">
-          <h1 className="mt-3 mb-3 fw-bold">Latest Recorded Stats</h1>
-          <LatestRecordedStats latestData={latestRecord} />
+          {/* Latest Recorded Stats */}
+          <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestFrost={latestFrost} latestMaxMin={latestMaxMin} last12HoursData={last12Hours} last24HoursData={last24Hours} lastWeekData={lastWeek}
+          last30DaysData={last30Days} hotColdLastWeekCount={hotColdLastWeekCount} hotColdLast30DaysCount={hotColdLast30DaysCount} movingAvgLast30Days={movingAvgLast30Days} />
           <div className="row justify-content-center">
-            <h1 className="mt-3 fw-bold">Latest Temperature Compared To Previous Years</h1>
+            <h1 className="mt-3 fw-bold text-black">Current Temperature Compared To Previous Years</h1>
             <div className="col-12 mt-3">
-              <LatestTemperatureYearlyComparisonChart data={anniversary}/>
+              <LatestTemperatureAndPrevYearsChart data={anniversary}/>
             </div>
           </div>
-          <h1 className="mt-3 mb-3 fw-bold">Temperature Evolution</h1>
-          {/* Avg Temperature Charts */}
-          <div className="row justify-content-center">
-            <div className="col-12 col-xl-6">
-              <YearlyAvgTemperatureChart data={yearly} />
-            </div>
-            <div className="col-12 col-xl-6 mt-3 mt-xl-0">
-              <MonthlyAvgTemperatureChart data={monthly} />
-            </div>
-            <div className="col-12 mt-3">
-              <DailyAvgTemperatureChart data={daily} />
-            </div>
-          </div>
-          <h1 className="mt-3 mb-3 fw-bold">Overall Stats</h1>
-          <OverallTemperatureStats hottestRecord={hottestRecord} coldestRecord={coldestRecord} />
+          <TemperatureEvolution yearly={yearly} monthly={monthly} daily={daily} />
+          <h1 className="mt-3 mb-3 fw-bold text-black">Overall Stats</h1>
+          <OverallTemperatureStats hottestRecord={hottestRecord} coldestRecord={coldestRecord} longestFrost={longestFrost} longestHeatwave={longestHeatwave} />
       </div>
-);
+    </main>
+  );
 }
 export default Temperature;

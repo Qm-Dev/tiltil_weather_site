@@ -17,10 +17,28 @@ export default function LineChart({labels, datasets, title, x_label, y_label, is
           legend:{
             display: is_legend_displayed,
           },
+          tooltip:{
+            callbacks: {
+              title: function(context) {
+                let label = context[0].label || '';
+                if (typeof label === 'string') {
+                  return label.replace(/[+-]\d{2}:\d{2}$/, '');
+                }
+                return label;
+              }
+            }
+          }
         },
         scales:{
           x: {
-            title: {display: true, text: x_label}
+            title: {display: true, text: x_label},
+            ticks: { // Remove the timezone
+              callback: function(val, index) {
+                const label = this.getLabelForValue(val);
+                if (typeof label !== 'string') return label;
+                return label.replace(/[+-]\d{2}:\d{2}$/, '');
+              }
+            }
           },
           y: {
             title: {display: true, text: y_label}
@@ -36,7 +54,7 @@ export default function LineChart({labels, datasets, title, x_label, y_label, is
   }, [labels, datasets, title, x_label, y_label, is_animated, is_legend_displayed]);
 
   return (
-  <div className="chart-container w-100 border border-black rounded-4 p-1" style={{ height: "450px" }}>
+  <div className="chart-container w-100 border border-2 border-black rounded-4 p-1" style={{ height: "500px", backgroundColor: "white" }}>
     <canvas className="my-4 w-100" ref={canvasRef} style={{ width:"100%", height:"100%" }}/>
   </div>
 );

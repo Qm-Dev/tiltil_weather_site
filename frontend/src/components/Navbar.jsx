@@ -1,4 +1,10 @@
 import cactus from '../assets/cactus.svg';
+import pressure from '../assets/pressure.svg';
+import thermometer from '../assets/thermometer.svg';
+import droplet from '../assets/droplet.svg';
+import rain from '../assets/rain.svg';
+import wind from '../assets/wind.svg';
+import login from '../assets/login.svg';
 
 const Navbar = () => {
     return (
@@ -9,21 +15,21 @@ const Navbar = () => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="mx-xl-5 gap-xl-3 gap-1 navbar-nav text-center">
-                        <li className="nav-item disabled">
-                            <a className="nav-link text-white" href="/temperature">🌡️ Temperature</a>
+                    <ul className="gap-xl-5 gap-md-3 gap-2 navbar-nav text-center w-100 fw-semibold">
+                        <li className="nav-item">
+                            <a className="nav-link text-white" href="/temperature"><img src={thermometer} alt="Temperature" style={{ height: '20px', marginRight: '5px' }} /> Temperature</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/humidity">💧 Humidity</a>
+                            <a className="nav-link text-white" href="/humidity"><img src={droplet} alt="Humidity" style={{ height: '20px', marginRight: '5px' }} /> Humidity</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/rain">🌧️ Rain</a>
+                            <a className="nav-link text-white" href="/rain"><img src={rain} alt="Rain" style={{ height: '20px', marginRight: '5px' }} /> Rain</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/wind">💨 Wind</a>
+                            <a className="nav-link text-white" href="/wind"><img src={wind} alt="Wind" style={{ height: '20px', marginRight: '5px' }} /> Wind</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled text-white" href="/pressure">📈 Pressure</a>
+                            <a className="nav-link text-white" href="/pressure"><img src={pressure} alt="Pressure" style={{ height: '20px', marginRight: '5px' }} /> Pressure</a>
                         </li>
                     </ul>
                 </div>
