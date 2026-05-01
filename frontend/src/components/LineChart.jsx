@@ -17,10 +17,28 @@ export default function LineChart({labels, datasets, title, x_label, y_label, is
           legend:{
             display: is_legend_displayed,
           },
+          tooltip:{
+            callbacks: {
+              title: function(context) {
+                let label = context[0].label || '';
+                if (typeof label === 'string') {
+                  return label.replace(/[+-]\d{2}:\d{2}$/, '');
+                }
+                return label;
+              }
+            }
+          }
         },
         scales:{
           x: {
-            title: {display: true, text: x_label}
+            title: {display: true, text: x_label},
+            ticks: { // Remove the timezone
+              callback: function(val, index) {
+                const label = this.getLabelForValue(val);
+                if (typeof label !== 'string') return label;
+                return label.replace(/[+-]\d{2}:\d{2}$/, '');
+              }
+            }
           },
           y: {
             title: {display: true, text: y_label}

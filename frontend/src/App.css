@@ -41,3 +41,13 @@
 .container h4, .container h2, .container h5 {
     font-family: 'Oswald', sans-serif;
 }
+
+.menuButton {
+    transform: translateY(0);
+    transition: transform ease-out;
+}
+
+.menuButton:hover {
+    transform: translateY(-5%);
+}
+

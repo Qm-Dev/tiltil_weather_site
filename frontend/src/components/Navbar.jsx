@@ -31,9 +31,6 @@ const Navbar = () => {
                         <li className="nav-item">
                             <a className="nav-link text-white" href="/pressure"><img src={pressure} alt="Pressure" style={{ height: '20px', marginRight: '5px' }} /> Pressure</a>
                         </li>
-                        <li className="nav-item ms-lg-auto">
-                            <a className="nav-link disabled text-white" href="/login"><img src={login} alt="Login" style={{ height: '20px', marginRight: '5px' }} /> Login</a>
-                        </li>
                     </ul>
                 </div>
             </div>

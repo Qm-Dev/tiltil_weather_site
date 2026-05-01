@@ -1,73 +1,33 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-import psycopg
+import psycopg, os
+
+EXPECTED_CSV_HEADERS = os.getenv("EXPECTED_CSV_HEADERS")
+TABLE_CREATE_COLS = os.getenv("TABLE_CREATE_COLS")
 
 # ======================================================
 # WeatherLink Dataset
 # ======================================================
 def update_dataset_table(db: Session, csv_text: str) -> True | psycopg.errors.Error:
     conn = db.connection().connection
-
     try:
         with conn.cursor() as cursor:
-            cursor.execute("""
-                            CREATE TABLE IF NOT EXISTS weather (
-                                record_date TIMESTAMP PRIMARY KEY,
-                                avg_temp REAL,
-                                hi_temp REAL,
-                                low_temp REAL,
-                                out_hum SMALLINT,
-                                dew_pt REAL,
-                                wind_speed REAL,
-                                wind_direction VARCHAR(16),
-                                wind_run REAL,
-                                hi_speed REAL,
-                                hi_dir VARCHAR(16),
-                                bar REAL,
-                                rain REAL,
-                                rain_rate REAL,
-                                heat_dd REAL,
-                                cool_dd REAL,
-                                in_temp REAL,
-                                in_hum SMALLINT,
-                                in_dew REAL,
-                                in_emc REAL,
-                                in_air_density REAL,
-                                et REAL,
-                                wind_samp INTEGER,
-                                wind_tx INTEGER,
-                                iss_recept REAL,
-                                arc_int SMALLINT
-                            );""")
-            cursor.execute("""
+            cursor.execute(f"""
+                            CREATE TABLE IF NOT EXISTS weather ({TABLE_CREATE_COLS});""")
+            cursor.execute(f"""
                             CREATE TEMP TABLE IF NOT EXISTS weather_stage AS
-                            SELECT
-                                record_date, avg_temp, hi_temp, low_temp,
-                                out_hum, dew_pt, wind_speed, wind_direction, wind_run,
-                                hi_speed, hi_dir, bar, rain, rain_rate, heat_dd, cool_dd,
-                                in_temp, in_hum, in_dew, in_emc, in_air_density, et, wind_samp,
-                                wind_tx, iss_recept, arc_int
+                            SELECT {EXPECTED_CSV_HEADERS}
                             FROM weather
-                            WHERE false;
+                            WHERE false;                            
                             """)
-            with cursor.copy("""
-                            COPY weather_stage(record_date, avg_temp, hi_temp, low_temp,
-                            out_hum, dew_pt, wind_speed, wind_direction, wind_run,
-                            hi_speed, hi_dir, bar, rain, rain_rate, heat_dd, cool_dd,
-                            in_temp, in_hum, in_dew, in_emc, in_air_density, et, wind_samp,
-                            wind_tx, iss_recept, arc_int)
+            with cursor.copy(f"""
+                            COPY weather_stage({EXPECTED_CSV_HEADERS})
                             FROM STDIN
-                            WITH (FORMAT CSV, DELIMITER ';', HEADER)
+                            WITH (FORMAT CSV, DELIMITER ',', HEADER, NULL '')
                             """) as copy:
                 copy.write(csv_text)
-            cursor.execute("""
-                           INSERT INTO weather(
-                            record_date, avg_temp, hi_temp, low_temp,
-                            out_hum, dew_pt, wind_speed, wind_direction, wind_run,
-                            hi_speed, hi_dir, bar, rain, rain_rate, heat_dd, cool_dd,
-                            in_temp, in_hum, in_dew, in_emc, in_air_density, et, wind_samp,
-                            wind_tx, iss_recept, arc_int
-                            )
+            cursor.execute(f"""
+                            INSERT INTO weather({EXPECTED_CSV_HEADERS})
                             SELECT *
                             FROM weather_stage
                             ON CONFLICT (record_date) DO NOTHING;
@@ -332,6 +292,7 @@ def get_hottest_record(db: Session):
                     weather
                 GROUP BY
                     record_date
+                HAVING MAX(hi_temp) IS NOT NULL
                 ORDER BY
                     MAX(hi_temp) DESC
                 LIMIT 1
@@ -347,6 +308,7 @@ def get_coldest_record(db: Session):
                     weather
                 GROUP BY
                     record_date
+                HAVING MIN(low_temp) IS NOT NULL
                 ORDER BY
                     MIN(low_temp) ASC
                 LIMIT 1

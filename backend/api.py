@@ -2,7 +2,10 @@ from fastapi import HTTPException, FastAPI, Depends, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import SessionLocal
 from sqlalchemy.orm import Session
-import db.crud as crud, os
+from scripts.extract import extract_from_csv
+from scripts.transform import clean_weather_data
+from scripts.load import load_to_postgres
+import db.crud as crud, os, io
 
 tags_metadata = [
     {
@@ -65,35 +68,23 @@ async def import_weather_records(db: Session = Depends(get_db), records_file: Up
     """
     Uploads weather records from the CSV file to the associated table in the database.
     """
-    if records_file.content_type != 'text/csv':
-        raise HTTPException(status_code=400, detail="Invalid file type.")
-    
+
     content = await records_file.read()
+    df_raw = extract_from_csv(io.BytesIO(content))
 
-    if not content:
-        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
-    
-    text = content.decode('utf-8')
+    try:
+        df_cleaned = clean_weather_data(df_raw)
+        result = load_to_postgres(db, df_cleaned)
 
-    if text == os.getenv("EXPECTED_CSV_HEADERS"):
-        raise HTTPException(status_code=400, detail="The uploaded file contains only headers and no data.")
-
-    headers = text.splitlines()[0]
-
-    if headers != os.getenv("EXPECTED_CSV_HEADERS"):
-        raise HTTPException(status_code=400, detail="Incorrect headers in the CSV file uploaded.")
-
-    table_updated = crud.update_dataset_table(db, text)
-
-    if table_updated["success"] is not True:
-        raise HTTPException(status_code=500, detail=f"Failed to upload records into the database ({table_updated['error']}).")
-    
-    if table_updated["inserted_count"] == 0:
-        raise HTTPException(status_code=200, detail="No new records were inserted into the database (all records in the file already exist in the database).")
-
-    return {"message": "Weather records imported successfully into the database.",
-            "inserted_count": table_updated["inserted_count"]
-    }
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=f"Error: {result['error']}")
+        
+        return {
+            "message": "ETL process completed",
+            "inserted": result["inserted_count"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
 
 # =======================================================
 # Temperature Endpoints
