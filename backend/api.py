@@ -1,11 +1,14 @@
 from fastapi import HTTPException, FastAPI, Depends, UploadFile, File
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import SessionLocal
 from sqlalchemy.orm import Session
 from scripts.extract import extract_from_csv
 from scripts.transform import clean_weather_data
 from scripts.load import load_to_postgres
-import db.crud as crud, os, io
+import db.crud as crud, os, io, pickle
+
+ml_models = {}
 
 tags_metadata = [
     {
@@ -31,15 +34,37 @@ tags_metadata = [
     {
         "name": "📈 Pressure",
         "description": "Operations related to pressure data.",
+    },
+    {
+        "name": "🤖 Machine Learning",
+        "description": "Operations related to predictions with classic Machine Learning techniques.",
     }
 ]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """s
+    App's life-cycle.
+    """
+
+    # ML model
+    path = "notebooks/ml_models/modelo_tiltil_lr.pkl"
+    try:
+        with open(path, "rb") as f:
+            ml_models["temp_predictor"] = pickle.load(f)
+    except FileNotFoundError:
+        print(f"Error: Model not found in the provided path ({path}).")
+    yield
+    ml_models.clear()
+    print("ML resources cleared.")
 
 #=======================================================
 # FastAPI Application Setup
 #=======================================================
 app = FastAPI(
     title="🌵 TilTil Weather Data API",
-    openapi_tags=tags_metadata
+    openapi_tags=tags_metadata,
+    lifespan=lifespan
 )
 app.add_middleware(
     CORSMiddleware,
@@ -317,6 +342,15 @@ def latest_wind_record(db: Session = Depends(get_db)):
     """
     return crud.get_latest_wind_stats(db)
 
+@app.get("/wind/historic/total_daily_wind_run", tags=["💨 Wind"])
+def total_daily_wind_run(db: Session = Depends(get_db), asc: bool = False):
+    """
+    Returns the historical total "amount" of wind that passed through the station per day.
+
+    By default, the endpoint returns the records ordered by date in descending order.
+    """
+    return crud.get_total_daily_wind_run(db, asc)
+
 # =======================================================
 # Pressure Endpoints
 # =======================================================
@@ -326,3 +360,34 @@ def latest_pressure_record(db: Session = Depends(get_db)):
     Returns the latest pressure record with its respective information.
     """
     return crud.get_latest_pressure_record(db)
+
+# =======================================================
+# ML Endpoints
+# =======================================================
+
+@app.get("/ml/avg_temp_pred", tags=["🤖 Machine Learning"])
+def average_temperature_prediction(db: Session = Depends(get_db)):
+    """
+    Predicts the average temperature in the next 15 minutes using the latest inserted record (most recent) in the database table.
+    """
+
+    model = ml_models.get("temp_predictor")
+    if not model:
+        raise HTTPException(status_code=503, detail="Prediction model is not loaded or unavailable.")
+    
+    features = crud.get_ml_avg_temp_features(db)
+    if not features:
+        raise HTTPException(status_code=400, detail="Not enough data to predict.")
+    
+    
+    input_vector = [list(features.values())]
+    next_record_date = input_vector[0][0]
+    input_vector[0].pop(0)
+
+    prediction = model.predict(input_vector)
+
+    return {
+        "next_record_date": next_record_date,
+        "avg_temp_prediction": round(float(prediction[0]),2)
+    }
+

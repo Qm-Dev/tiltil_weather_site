@@ -15,3 +15,21 @@ export async function getLatestWindRecord() {
 
     return response.json();
 }
+
+export async function getTotalDailyWindRun(ascending = false) {
+    const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/wind/historic/total_daily_wind_run?asc=${ascending}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch historical daily wind run data.");
+    }
+
+    return response.json();
+}

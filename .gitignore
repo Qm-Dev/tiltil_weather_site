@@ -30,3 +30,9 @@ build/
 
 # Executables
 *.exe
+
+# Visualizations
+backend/notebooks/visualizations/*/*.png
+
+# Models
+backend/notebooks/ml_models/*.pkl

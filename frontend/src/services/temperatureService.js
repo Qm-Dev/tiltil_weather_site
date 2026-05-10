@@ -356,3 +356,21 @@ export async function getTemperatureMovingAvg() {
 
   return response.json();
 }
+
+export async function getPredictionNextAvgTemp() {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/ml/avg_temp_pred`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch predicted temperature.");
+  }
+
+  return response.json();
+}
