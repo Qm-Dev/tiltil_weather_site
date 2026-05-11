@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from scripts.extract import extract_from_csv
 from scripts.transform import clean_weather_data
 from scripts.load import load_to_postgres
-import db.crud as crud, os, io, pickle
+from db import crud
+import os, io, pickle
 
 ml_models = {}
 
