@@ -36,3 +36,8 @@ backend/notebooks/visualizations/*/*.png
 
 # Models
 backend/notebooks/ml_models/*.pkl
+
+# C Files
+*.ilk
+*.pdb
+*.obj

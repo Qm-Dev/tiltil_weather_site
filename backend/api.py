@@ -44,7 +44,7 @@ tags_metadata = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """s
+    """
     App's life-cycle.
     """
 
@@ -92,21 +92,25 @@ def get_db():
 @app.post("/weatherlink_dataset/db_import_weather_records", tags=["📄 WeatherLink Dataset"])
 async def import_weather_records(db: Session = Depends(get_db), records_file: UploadFile = File(...)):
     """
-    Uploads weather records from the CSV file to the associated table in the database.
+    Uploads weather records from the received file into the associated table in the database.
     """
 
+    print(f"[ETL_WEATHER_RECORDS] Received file: {records_file.filename}\nContent type: {records_file.content_type}")
     content = await records_file.read()
     df_raw = extract_from_csv(io.BytesIO(content))
+    print(f"\n[ETL_WEATHER_RECORDS 1/3] Extracted {len(df_raw)} records from the uploaded file.")
 
     try:
         df_cleaned = clean_weather_data(df_raw)
+        print(f"\n[ETL_WEATHER_RECORDS 2/3] Data has been cleaned.")
         result = load_to_postgres(db, df_cleaned)
+        print(f"\n[ETL_WEATHER_RECORDS 3/3] Data has been loaded into the database.")
 
         if not result["success"]:
             raise HTTPException(status_code=500, detail=f"Error: {result['error']}")
-        
+        print(f"\n[ETL_WEATHER_RECORDS] ETL process completed. Inserted {result['inserted_count']} records.")
         return {
-            "message": "ETL process completed",
+            "message": "ETL process completed.",
             "inserted": result["inserted_count"]
         }
     except Exception as e:
@@ -375,17 +379,18 @@ def average_temperature_prediction(db: Session = Depends(get_db)):
     model = ml_models.get("temp_predictor")
     if not model:
         raise HTTPException(status_code=503, detail="Prediction model is not loaded or unavailable.")
+    print(f"[ML_TEMP 1/2] Using model: {model}")
     
     features = crud.get_ml_avg_temp_features(db)
     if not features:
         raise HTTPException(status_code=400, detail="Not enough data to predict.")
-    
     
     input_vector = [list(features.values())]
     next_record_date = input_vector[0][0]
     input_vector[0].pop(0)
 
     prediction = model.predict(input_vector)
+    print(f"[ML_TEMP 2/2] Prediction: {round(prediction[0], 5)}°C at {next_record_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
         "next_record_date": next_record_date,
