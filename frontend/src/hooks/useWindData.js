@@ -1,26 +1,25 @@
 import { useState, useEffect } from 'react';
 import {
-    getLatestWindRecord
+    getLatestWindRecord,
+    getTotalDailyWindRun
 } from '../services/windService';
 
 export const useWindData = () => {
 
     const [loading, setLoading] = useState(true);
 
-    const [latestWind, setLatestWind] = useState({})
+    const [latestWind, setLatestWind] = useState({});
+    const [totalDailyWindRun, setTotalDailyWindRun] = useState([]);
 
     useEffect(() => {
         const load = async () => {
             try {
                 const latestWindData = await getLatestWindRecord();
-                setLatestWind({
-                    record_date: latestWindData.record_date,
-                    wind_speed: latestWindData.wind_speed,
-                    wind_direction: latestWindData.wind_direction,
-                    wind_run: latestWindData.wind_run,
-                    hi_speed: latestWindData.hi_speed,
-                    hi_dir: latestWindData.hi_dir
-                });
+                setLatestWind(latestWindData);
+
+                const totalDailyWindRunData = await getTotalDailyWindRun();
+                setTotalDailyWindRun(totalDailyWindRunData);
+
             }
             finally {
                 setLoading(false);
@@ -29,5 +28,5 @@ export const useWindData = () => {
         load();
     }, []);
 
-    return { loading, latestWind };
+    return { loading, latestWind, totalDailyWindRun };
 }

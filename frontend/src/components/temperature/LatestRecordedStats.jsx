@@ -16,7 +16,7 @@ import { LastPeriodHoursTemperatureChart, LastPeriodDaysTemperatureChart, Moving
 // Components
 import DaysHotCold from './DaysHotCold';
 
-export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, last12HoursData, last24HoursData, lastWeekData, last30DaysData, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days}) {
+export default function LatestRecordedStats({latestData, latestHeatwave, latestFrost, latestMaxMin, last12HoursData, last24HoursData, lastWeekData, last30DaysData, predictedTemp, hotColdLastWeekCount, hotColdLast30DaysCount, movingAvgLast30Days}) {
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -54,6 +54,7 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 <h2 className="fw-bold">{latestData?.min} °C</h2>
                 <h4>{parseISO(latestData?.date).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false })}</h4>
             </div>
+            <h3 className="fw-bold text-black fs-5">Predicted Next Avg. Temperature ({parseISO(predictedTemp?.next_record_date).toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false})}) of {predictedTemp?.avg_temp_prediction}°C.</h3>
             <div className="col-12 col-sm-4 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                 <img src={Fire} alt="Max Temperature" className="mt-1 mb-2" />
                 <h2 className="fw-bold">Max. Temp</h2>
@@ -66,7 +67,7 @@ export default function LatestRecordedStats({latestData, latestHeatwave, latestF
                 <h4>{latestMaxMin?.min} °C</h4>
                 <h5>{parseISO(latestMaxMin?.date_min).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false })}</h5>
             </div>
-            <h3 className="fw-bold text-black">Today's Temperature Range: {(latestMaxMin?.max - latestMaxMin?.min).toFixed(1)} °C</h3>
+            <h3 className="fw-bold text-black fs-5">Today's Temperature Range: {(latestMaxMin?.max - latestMaxMin?.min).toFixed(1)} °C</h3>
             <div className="col-12 col-sm-4 border border-2 border-black rounded-3" style={{backgroundColor: '#fc8e34', color: '#0F0F0F'}}>
                 <img src={Heatwave} alt="Heatwave" className="mt-1 w-25" />
                 {isRecentHeatwave  ? (
