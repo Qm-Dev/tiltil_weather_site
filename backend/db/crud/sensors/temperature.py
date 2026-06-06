@@ -37,6 +37,7 @@ def get_temperature_by_year(db: Session):
                 LEFT JOIN
                     yearly_historical_temps yht ON ytr.date = yht.date
                 WHERE ytr.record_amount > 28000
+                ORDER BY yht.date ASC
                 """)
     return db.execute(query).mappings().all()
 

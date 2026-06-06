@@ -33,6 +33,8 @@ def get_humidity_by_year(db: Session):
             LEFT JOIN
                 yearly_historical_hum yhh ON ytr.date = yhh.date
             WHERE ytr.record_amount > 28000
+            ORDER BY
+                 yhh.date ASC
                 """)
     return db.execute(query).mappings().all()
 

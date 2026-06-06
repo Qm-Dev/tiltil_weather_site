@@ -1,0 +1,12 @@
+notebooks/**
+!notebooks/ml_models/
+!notebooks/ml_models/**
+*.ipynb
+
+*.wlk
+*.csv
+*.txt
+!requirements.txt
+
+__pycache__/
+*.pyc

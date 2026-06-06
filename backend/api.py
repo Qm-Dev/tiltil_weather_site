@@ -1,399 +1,64 @@
-from fastapi import HTTPException, FastAPI, Depends, UploadFile, File
+import os, pickle
 from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from db.database import SessionLocal
-from sqlalchemy.orm import Session
-from scripts.extract import extract_from_csv
-from scripts.transform import clean_weather_data
-from scripts.load import load_to_postgres
-from db import crud
-import os, io, pickle
-
-ml_models = {}
+from fastapi.responses import RedirectResponse
+from routes import dataset, temperature, rainfall, humidity, wind, pressure, ml
 
 tags_metadata = [
-    {
-        "name": "📄 WeatherLink Dataset",
-        "description": "Operations related to the WeatherLink historical dataset.",
-    },
-    {
-        "name": "🌡️ Temperature",
-        "description": "Operations related to temperature data.",
-    },
-    {
-        "name": "🌧️ Rainfall",
-        "description": "Operations related to rainfall data.",
-    },
-    {
-        "name": "💧 Humidity & Dew Point",
-        "description": "Operations related to humidity and dew point data.",
-    },
-    {
-        "name": "💨 Wind",
-        "description": "Operations related to wind data.",
-    },
-    {
-        "name": "📈 Pressure",
-        "description": "Operations related to pressure data.",
-    },
-    {
-        "name": "🤖 Machine Learning",
-        "description": "Operations related to predictions with classic Machine Learning techniques.",
-    }
+    {"name": "📄 WeatherLink Dataset", "description": "Operations related to the WeatherLink historical dataset."},
+    {"name": "🌡️ Temperature", "description": "Operations related to temperature data."},
+    {"name": "🌧️ Rainfall", "description": "Operations related to rainfall data."},
+    {"name": "💧 Humidity & Dew Point", "description": "Operations related to humidity and dew point data."},
+    {"name": "💨 Wind", "description": "Operations related to wind data."},
+    {"name": "📈 Pressure", "description": "Operations related to pressure data."},
+    {"name": "🤖 Machine Learning", "description": "Operations related to predictions with classic Machine Learning techniques."}
 ]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    App's life-cycle.
+    App's life cycle and resources.
     """
-
-    # ML model
     path = "notebooks/ml_models/modelo_tiltil_lr.pkl"
     try:
         with open(path, "rb") as f:
-            ml_models["temp_predictor"] = pickle.load(f)
+            app.state.temp_predictor = pickle.load(f)
+            print(f"[API] ML model loaded successfully into application state.")
     except FileNotFoundError:
-        print(f"Error: Model not found in the provided path ({path}).")
+        print(f"[API] Error: Model not found in the provided path ({path}).")
+        app.state.temp_predictor = None
+        
     yield
-    ml_models.clear()
-    print("ML resources cleared.")
+    if hasattr(app.state, "temp_predictor"):
+        del app.state.temp_predictor
+    print(f"[API] ML resources cleared.")
 
-#=======================================================
-# FastAPI Application Setup
-#=======================================================
 app = FastAPI(
     title="🌵 TilTil Weather Data API",
     openapi_tags=tags_metadata,
     lifespan=lifespan
 )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_URL")],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"]
 )
-@app.get("/")
+
+# =======================================================
+# Modularized Routers
+# =======================================================
+app.include_router(dataset.router)
+app.include_router(temperature.router)
+app.include_router(rainfall.router)
+app.include_router(humidity.router)
+app.include_router(wind.router)
+app.include_router(pressure.router)
+app.include_router(ml.router)
+
+@app.get("/", include_in_schema=False)
 async def root():
-    return {"message": "Welcome to the TilTil Weather Data API! Visit /docs for API documentation."}
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# =======================================================
-# WeatherLink Dataset Endpoints
-# =======================================================
-@app.post("/weatherlink_dataset/db_import_weather_records", tags=["📄 WeatherLink Dataset"])
-async def import_weather_records(db: Session = Depends(get_db), records_file: UploadFile = File(...)):
-    """
-    Uploads weather records from the received file into the associated table in the database.
-    """
-
-    print(f"[ETL_WEATHER_RECORDS] Received file: {records_file.filename}\nContent type: {records_file.content_type}")
-    content = await records_file.read()
-    df_raw = extract_from_csv(io.BytesIO(content))
-    print(f"\n[ETL_WEATHER_RECORDS 1/3] Extracted {len(df_raw)} records from the uploaded file.")
-
-    try:
-        df_cleaned = clean_weather_data(df_raw)
-        print(f"\n[ETL_WEATHER_RECORDS 2/3] Data has been cleaned.")
-        result = load_to_postgres(db, df_cleaned)
-        print(f"\n[ETL_WEATHER_RECORDS 3/3] Data has been loaded into the database.")
-
-        if not result["success"]:
-            raise HTTPException(status_code=500, detail=f"Error: {result['error']}")
-        print(f"\n[ETL_WEATHER_RECORDS] ETL process completed. Inserted {result['inserted_count']} records.")
-        return {
-            "message": "ETL process completed.",
-            "inserted": result["inserted_count"]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
-
-# =======================================================
-# Temperature Endpoints
-# =======================================================
-@app.get("/temperature/historic/yearly", tags=["🌡️ Temperature"])
-def historical_yearly_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures grouped by each year (ascending order) from the weather records.
-    """
-    return crud.get_temperature_by_year(db)
-
-@app.get("/temperature/historic/monthly", tags=["🌡️ Temperature"])
-def historical_monthly_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures grouped by each year and month (ascending order) from the weather records.
-    """
-    return crud.get_temperature_by_year_month(db)
-
-@app.get("/temperature/historic/daily", tags=["🌡️ Temperature"])
-def historical_daily_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures grouped by each year, month, and day (ascending order) from the weather records.
-    """
-    return crud.get_temperature_by_year_month_day(db)
-
-@app.get("/temperature/historic/last_12_hours", tags=["🌡️ Temperature"])
-def historical_last_12_hours_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures registered in the last 12 hours from the weather records.
-    """
-    return crud.get_last_12_hours_temperatures(db)
-
-@app.get("/temperature/historic/last_24_hours", tags=["🌡️ Temperature"])
-def historical_last_24_hours_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures registered in the last 24 hours from the weather records.
-    """
-    return crud.get_last_24_hours_temperatures(db)
-
-@app.get("/temperature/historic/last_week", tags=["🌡️ Temperature"])
-def historical_last_week_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures registered in the last 7 days from the weather records. Excludes the last day registered in the database.
-    """
-    return crud.get_last_week_temperatures(db)
-
-@app.get("/temperature/historic/last_30_days", tags=["🌡️ Temperature"])
-def historical_last_30_days_temperatures(db: Session = Depends(get_db)):
-    """
-    Returns the average, maximum, and minimum temperatures registered in the last 30 days from the weather records. Excludes the last day registered in the database.
-    """
-    return crud.get_last_30_days_temperatures(db)
-
-@app.get("/temperature/historic/anniversary_timestamp_comparison", tags=["🌡️ Temperature"])
-def temperature_anniversary_timestamp_comparison(db: Session = Depends(get_db)):
-    """
-    Returns the temperatures registered at the same timestamp (MM-DD HH:MM:00) across different years, taking the last entry in the database as a reference point.
-    """
-    return crud.get_temperature_anniversary_timestamp_comparison(db)
-
-@app.get("/temperature/historic/hottest_record", tags=["🌡️ Temperature"])
-def hottest_temperature_record(db: Session = Depends(get_db)):
-    """
-    Returns the record with the highest temperature from the weather records.
-    """
-    return crud.get_hottest_record(db)
-
-@app.get("/temperature/historic/coldest_record", tags=["🌡️ Temperature"])
-def coldest_temperature_record(db: Session = Depends(get_db)):
-    """
-    Returns the record with the lowest temperature from the weather records.
-    """
-    return crud.get_coldest_record(db)
-
-@app.get("/temperature/latest_record", tags=["🌡️ Temperature"])
-def latest_temperature_record(db: Session = Depends(get_db)):
-    """
-    Returns the latest temperature record from the weather records.
-    """
-    return crud.get_latest_record(db)
-
-@app.get("/temperature/latest_max_min", tags=["🌡️ Temperature"])
-def latest_max_min_temperature(db: Session = Depends(get_db)):
-    """
-    Returns the latest maximum and minimum temperature records from the day of the latest record.
-    """
-    return crud.get_latest_max_min(db)
-
-@app.get("/temperature/frosts", tags=["🌡️ Temperature"])
-def frost_periods(db: Session = Depends(get_db)):
-    """
-    Returns continuous periods of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during those periods.
-    """
-    return crud.get_frosts(db)
-
-@app.get("/temperature/frosts/latest", tags=["🌡️ Temperature"])
-def latest_frost_period(db: Session = Depends(get_db)):
-    """
-    Returns the latest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
-    """
-    return crud.get_latest_frost(db)
-
-@app.get("/temperature/frosts/longest", tags=["🌡️ Temperature"])
-def longest_frost_period(db: Session = Depends(get_db)):
-    """
-    Returns the longest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
-    """
-    return crud.get_longest_frost(db)
-
-@app.get("/temperature/heatwaves", tags=["🌡️ Temperature"])
-def heatwave_periods(db: Session = Depends(get_db)):
-    """
-    Returns continuous periods of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during those periods.
-    """
-    return crud.get_heatwaves(db)
-
-@app.get("/temperature/heatwaves/latest", tags=["🌡️ Temperature"])
-def latest_heatwave_period(db: Session = Depends(get_db)):
-    """
-    Returns the latest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
-    """
-    return crud.get_latest_heatwave(db)
-
-@app.get("/temperature/heatwaves/longest", tags=["🌡️ Temperature"])
-def longest_heatwave_period(db: Session = Depends(get_db)):
-    """
-    Returns the longest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
-    """
-    return crud.get_longest_heatwave(db)
-
-@app.get("/temperature/hot_cold_days/last_week", tags=["🌡️ Temperature"])
-def hot_cold_days_last_week(db: Session = Depends(get_db)):
-    """
-    Returns the number of hot and cold days in the last 7 days from the weather records.
-    """
-    return crud.get_amount_hot_cold_days_last_week(db)
-
-@app.get("/temperature/hot_cold_days/last_30_days", tags=["🌡️ Temperature"])
-def hot_cold_days_last_30_days(db: Session = Depends(get_db)):
-    """
-    Returns the number of hot and cold days in the last 30 days from the weather records.
-    """
-    return crud.get_amount_hot_cold_days_last_30_days(db)
-
-@app.get("/temperature/moving_average", tags=["🌡️ Temperature"])
-def temperature_moving_average(db: Session = Depends(get_db)):
-    """
-    Returns the simple moving average temperature for the last 30 days from the weather records. Window size of 7 days.
-    The moving average is calculated inside the database with the help of Window Functions.
-    """
-    return crud.get_temperature_moving_avg_7_days(db)
-
-# =======================================================
-# Rainfall Endpoints
-# =======================================================
-@app.get("/rainfall/historic/yearly", tags=["🌧️ Rainfall"])
-def historical_rainfall_by_year(db: Session = Depends(get_db)):
-    """
-    Returns the total rainfall grouped by each year (ascending order) from the weather records.
-    """
-    return crud.get_rainfall_by_year(db)
-
-@app.get("/rainfall/historic/monthly", tags=["🌧️ Rainfall"])
-def historical_rainfall_by_year_and_month(db: Session = Depends(get_db)):
-    """
-    Returns the total rainfall grouped by each year and month (ascending order) from the weather records.
-    """
-    return crud.get_rainfall_by_year_month(db)
-
-@app.get("/rainfall/rainy_days", tags=["🌧️ Rainfall"])
-def rainy_days(db: Session = Depends(get_db)):
-    """
-    Returns the rainy days (days with total rainfall greater than 2.5mm) from the weather records.
-    """
-    return crud.get_rainy_days(db)
-
-
-# =======================================================
-# Humidity Endpoints
-# =======================================================
-@app.get("/humidity/historic/yearly", tags=["💧 Humidity & Dew Point"])
-def historical_yearly_average_humidity(db: Session = Depends(get_db)):
-    """
-    Returns the average humidity grouped by each year (ascending order) from the weather records.
-    """
-    return crud.get_humidity_by_year(db)
-
-@app.get("/humidity/historic/monthly", tags=["💧 Humidity & Dew Point"])
-def historical_monthly_average_humidity(db: Session = Depends(get_db)):
-    """
-    Returns the average humidity grouped by each year and month (ascending order) from the weather records.
-    """
-    return crud.get_humidity_by_year_month(db)
-
-@app.get("/humidity/historic/daily", tags=["💧 Humidity & Dew Point"])
-def historical_daily_average_humidity(db: Session = Depends(get_db)):
-    """
-    Returns the average humidity grouped by each year, month, and day (ascending order) from the weather records.
-    """
-    return crud.get_humidity_by_year_month_day(db)
-
-@app.get("/humidity/historic/last_24_hours", tags=["💧 Humidity & Dew Point"])
-def historical_humidity_last_24_hours(db: Session = Depends(get_db)):
-    """
-    Returns the average humidity for the last 24 hours from the weather records.
-    """
-    return crud.get_humidity_last_24_hours(db)
-
-@app.get("/humidity/latest_record", tags=["💧 Humidity & Dew Point"])
-def latest_humidity_record(db: Session = Depends(get_db)):
-    """
-    Returns the latest humidity record from the weather records.
-    """
-    return crud.get_humidity_latest_record(db)
-
-@app.get("/humidity/latest_max_min", tags=["💧 Humidity & Dew Point"])
-def latest_humidity_max_min(db: Session = Depends(get_db)):
-    """
-    Returns the latest maximum and minimum humidity records (i.e the most recent day) from the weather records.
-    """
-    return crud.get_humidity_latest_max_min(db)
-
-# =======================================================
-# Wind Endpoints
-# =======================================================
-@app.get("/wind/latest_record", tags=["💨 Wind"])
-def latest_wind_record(db: Session = Depends(get_db)):
-    """
-    Returns the latest wind record and their respective information.
-    """
-    return crud.get_latest_wind_stats(db)
-
-@app.get("/wind/historic/total_daily_wind_run", tags=["💨 Wind"])
-def total_daily_wind_run(db: Session = Depends(get_db), asc: bool = False):
-    """
-    Returns the historical total "amount" of wind that passed through the station per day.
-
-    By default, the endpoint returns the records ordered by date in descending order.
-    """
-    return crud.get_total_daily_wind_run(db, asc)
-
-# =======================================================
-# Pressure Endpoints
-# =======================================================
-@app.get("/pressure/latest_record", tags=["📈 Pressure"])
-def latest_pressure_record(db: Session = Depends(get_db)):
-    """
-    Returns the latest pressure record with its respective information.
-    """
-    return crud.get_latest_pressure_record(db)
-
-# =======================================================
-# ML Endpoints
-# =======================================================
-
-@app.get("/ml/avg_temp_pred", tags=["🤖 Machine Learning"])
-def average_temperature_prediction(db: Session = Depends(get_db)):
-    """
-    Predicts the average temperature in the next 15 minutes using the latest inserted record (most recent) in the database table.
-    """
-
-    model = ml_models.get("temp_predictor")
-    if not model:
-        raise HTTPException(status_code=503, detail="Prediction model is not loaded or unavailable.")
-    print(f"[ML_TEMP 1/2] Using model: {model}")
-    
-    features = crud.get_ml_avg_temp_features(db)
-    if not features:
-        raise HTTPException(status_code=400, detail="Not enough data to predict.")
-    
-    input_vector = [list(features.values())]
-    next_record_date = input_vector[0][0]
-    input_vector[0].pop(0)
-
-    prediction = model.predict(input_vector)
-    print(f"[ML_TEMP 2/2] Prediction: {round(prediction[0], 5)}°C at {next_record_date.strftime('%Y-%m-%d %H:%M:%S')}")
-
-    return {
-        "next_record_date": next_record_date,
-        "avg_temp_prediction": round(float(prediction[0]),2)
-    }
-
+    return RedirectResponse(url="/docs")

@@ -5,6 +5,7 @@ venv/
 
 # Environment Variables
 .env
+.env.production
 
 # Python Cache Files
 __pycache__/
@@ -27,6 +28,7 @@ build/
 
 # Text Files
 *.txt
+!requirements-dev.txt
 
 # Executables
 *.exe
