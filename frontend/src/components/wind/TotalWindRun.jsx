@@ -37,7 +37,7 @@ export default function TotalWindRun({windRunList}) {
                             ))
                         ) :(
                             <tr>
-                                <td colSpan="2" className="text-muted">No hay registros.</td>
+                                <td colSpan="2" className="text-muted">There is no available records to show at the moment.</td>
                             </tr>
                         )}
                     </tbody>

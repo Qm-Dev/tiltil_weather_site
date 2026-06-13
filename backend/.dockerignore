@@ -1,6 +1,6 @@
 notebooks/**
-!notebooks/ml_models/
-!notebooks/ml_models/**
+notebooks/ml_models/**
+!notebooks/ml_models/lr.pkl
 *.ipynb
 
 *.wlk
@@ -8,5 +8,5 @@ notebooks/**
 *.txt
 !requirements.txt
 
-__pycache__/
-*.pyc
+**/__pycache__/
+**/*.pyc
