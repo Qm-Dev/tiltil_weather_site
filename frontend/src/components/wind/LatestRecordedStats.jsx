@@ -16,12 +16,12 @@ export default function LatestRecordedStats({ latestRecord }) {
                 <div className="col-12 col-sm-5 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                     <img src={WindRun} alt="Wind Run" className="m-1" />
                     <h2>Wind Speed</h2>
-                    <h3>{latestRecord?.wind_speed ? `${latestRecord.wind_speed} km/h` : `Wind Speed is not available.`}</h3>
+                    <h3>{(latestRecord?.wind_speed ?? null) !== null ? `${latestRecord.wind_speed} km/h` : `Wind Speed is not available.`}</h3>
                 </div>
                 <div className="col-12 col-sm-5 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                     <img src={WindRun} alt="Wind Run" className="m-1" />
                     <h2>Wind Speed (Highest)</h2>
-                    <h3>{latestRecord?.hi_speed ? `${latestRecord.hi_speed} km/h` : `Wind Speed is not available.`}</h3>
+                    <h3>{(latestRecord?.hi_speed ?? null) !== null ? `${latestRecord.hi_speed} km/h` : `Wind Speed is not available.`}</h3>
                 </div>
                 <div className="col-12 col-sm-5 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                     <img src={Compass} alt="Compass" className="m-1" />
@@ -36,7 +36,7 @@ export default function LatestRecordedStats({ latestRecord }) {
                 <div className="col-12 col-sm-5 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                     <img src={WindRun} alt="Wind Run" className="m-1" />
                     <h2>Wind Run</h2>
-                    <h3>{latestRecord?.wind_run ? `${latestRecord.wind_run}` : `Wind Run is not available.`}</h3>
+                    <h3>{(latestRecord?.wind_run ?? null) !== null ? `${latestRecord.wind_run} km` : `Wind Run is not available.`}</h3>
                 </div>
             </div>
         </>
