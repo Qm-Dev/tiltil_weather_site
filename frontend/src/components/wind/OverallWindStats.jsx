@@ -2,7 +2,7 @@ import { parseISO, format } from "date-fns";
 
 export default function OverallWindStats({ windiestDay }){
 
-    const parsedDate = windiestDay.date ? parseISO(windiestDay.date).toLocaleDateString("es-CL") : null;
+    const parsedDate = windiestDay?.date ? parseISO(windiestDay.date) : null;
     const readableDate = parsedDate ? format(parsedDate, "do MMMM, yyyy") : null;
     const domDirsAreTheSame = windiestDay.dom_wind_dir === windiestDay.dom_hi_wind_dir;
 
