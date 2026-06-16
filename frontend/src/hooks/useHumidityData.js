@@ -23,33 +23,48 @@ export const useHumidityData = () => {
     useEffect(() => {
         const load = async () => {
             try {
-                const yearlyData = await getYearlyHumidity();
+                const [
+                    yearlyData,
+                    monthlyData,
+                    dailyData,
+                    last24HoursData,
+                    latestRecordData,
+                    latestMaxMinData
+                ] = await Promise.all([
+                    getYearlyHumidity(),
+                    getMonthlyHumidity(),
+                    getDailyHumidity(),
+                    getHumidityLast24Hours(),
+                    getLatestHumidityRecord(),
+                    getLatestMaxMinHumidity()
+                ]);
+
                 setYearly({
                     labels: yearlyData.map(d => d.date),
                     values: yearlyData.map(d => d.avg_hum)
                 });
-                const monthlyData = await getMonthlyHumidity();
+
                 setMonthly({
                     labels: monthlyData.map(d => d.date),
                     values: monthlyData.map(d => d.avg_hum)
                 });
-                const dailyData = await getDailyHumidity();
+
                 setDaily({
                     labels: dailyData.map(d => d.date),
                     values: dailyData.map(d => d.avg_hum)
                 });
-                const last24HoursData = await getHumidityLast24Hours();
+
                 setLast24Hours({
                     labels: last24HoursData.map(d => d.date),
                     values: last24HoursData.map(d => d.out_hum)
                 });
-                const latestRecordData = await getLatestHumidityRecord();
+
                 setLatestRecord({
                     timestamp: latestRecordData.date,
                     humidity: latestRecordData.humidity,
                     dew_point: latestRecordData.dew_point
                 });
-                const latestMaxMinData = await getLatestMaxMinHumidity();
+
                 setLatestMaxMin({
                     max_timestamp: latestMaxMinData.date_max,
                     max_hum: latestMaxMinData.max_hum,
@@ -59,8 +74,9 @@ export const useHumidityData = () => {
                     min_dew_point: latestMaxMinData.min_dew_point
                 });
 
-            }
-            finally {
+            } catch (error) {
+                console.error("Failed to load humidity data: ", error);
+            } finally {
                 setLoading(false);
             }
         };

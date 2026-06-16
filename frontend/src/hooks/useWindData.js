@@ -16,13 +16,17 @@ export const useWindData = () => {
     useEffect(() => {
         const load = async () => {
             try {
-                const latestWindData = await getLatestWindRecord();
+                const [
+                    latestWindData,
+                    totalDailyWindRunData,
+                    windiestDayData
+                ] = await Promise.all([
+                    getLatestWindRecord(),
+                    getTotalDailyWindRun(),
+                    getWindiestDay()
+                ]);
                 setLatestWind(latestWindData);
-
-                const totalDailyWindRunData = await getTotalDailyWindRun();
                 setTotalDailyWindRun(totalDailyWindRunData);
-
-                const windiestDayData = await getWindiestDay();
                 setWindiestDay(windiestDayData);
             }
             finally {
