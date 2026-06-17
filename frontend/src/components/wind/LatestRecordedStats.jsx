@@ -1,4 +1,4 @@
-import { parseISO } from "date-fns";
+import { formatDateTime } from '../../utils/dateFormatter';
 
 // Assets
 import Compass from '../../assets/compass.svg';
@@ -6,7 +6,7 @@ import WindRun from '../../assets/wind_run.svg';
 
 export default function LatestRecordedStats({ latestRecord }) {
 
-    const parsedDate = latestRecord.record_date ? parseISO(latestRecord.record_date).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }) : null;
+    const parsedDate = formatDateTime(latestRecord.record_date);
 
     return (
         <>

@@ -36,7 +36,7 @@ export async function getTotalDailyWindRun(ascending = false) {
 
 export async function getWindiestDay() {
     const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/wind/historic/windiest_day`,
+        `${import.meta.env.VITE_API_BASE_URL}/wind/historic/windiest_days`,
         {
             method: "GET",
             headers: {

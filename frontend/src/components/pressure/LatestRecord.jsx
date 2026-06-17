@@ -1,10 +1,12 @@
-import { parseISO } from "date-fns";
+// Utils
+import { formatDateTime } from "../../utils/dateFormatter";
 
+// Assets
 import Barometer from "../../assets/barometer.svg";
 
 export default function LatestRecord({ latestRecord }) {
 
-    const parsedDate = latestRecord.record_date ? parseISO(latestRecord.record_date).toLocaleDateString("es-CL", { hour: "2-digit", minute: "2-digit" , hour12: false }) : null;
+    const parsedDate = formatDateTime(latestRecord.record_date);
 
     return (
         <>
