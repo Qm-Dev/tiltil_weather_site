@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     """
     App's life cycle and resources.
     """
-    path = "notebooks/ml_models/modelo_tiltil_lr.pkl"
+    path = "notebooks/ml_models/lr.pkl"
     try:
         with open(path, "rb") as f:
             app.state.temp_predictor = pickle.load(f)

@@ -33,3 +33,21 @@ export async function getTotalDailyWindRun(ascending = false) {
 
     return response.json();
 }
+
+export async function getWindiestDay() {
+    const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/wind/historic/windiest_days`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch windiest day data.");
+    }
+
+    return response.json();
+}

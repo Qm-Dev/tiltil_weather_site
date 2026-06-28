@@ -25,8 +25,8 @@ export default function TotalWindRun({windRunList}) {
                     </thead>
                     <tbody className='table-group-divider'>
                         {currentRecords.length > 0 ? (
-                            currentRecords.map((record, index) => (
-                                <tr>
+                            currentRecords.map((record) => (
+                                <tr key={record.record_date}>
                                     <td>
                                         {parseISO(record.record_date).toLocaleDateString("es-CL")}
                                     </td>
@@ -37,7 +37,7 @@ export default function TotalWindRun({windRunList}) {
                             ))
                         ) :(
                             <tr>
-                                <td colSpan="2" className="text-muted">No hay registros.</td>
+                                <td colSpan="2" className="text-muted">There is no available records to show at the moment.</td>
                             </tr>
                         )}
                     </tbody>

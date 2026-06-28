@@ -7,6 +7,7 @@ import LoadingPage from '../components/LoadingPage.jsx';
 import LatestRecordedStats from '../components/temperature/LatestRecordedStats.jsx';
 import OverallTemperatureStats from '../components/temperature/OverallTemperatureStats.jsx';
 import TemperatureEvolution from '../components/temperature/TemperatureEvolution.jsx';
+import Overview from '../components/temperature/Overview.jsx';
 
 const Temperature = () => {
   const { loading, yearly, monthly, daily, last12Hours, last24Hours,
@@ -22,8 +23,8 @@ const Temperature = () => {
     <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
       <div className="container text-center">
           {/* Latest Recorded Stats */}
-          <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestFrost={latestFrost} latestMaxMin={latestMaxMin} last12HoursData={last12Hours} last24HoursData={last24Hours} lastWeekData={lastWeek}
-          last30DaysData={last30Days} predictedTemp={predictedTemp} hotColdLastWeekCount={hotColdLastWeekCount} hotColdLast30DaysCount={hotColdLast30DaysCount} movingAvgLast30Days={movingAvgLast30Days} />
+          <LatestRecordedStats latestData={latestRecord} latestHeatwave={latestHeatwave} latestFrost={latestFrost} latestMaxMin={latestMaxMin} predictedTemp={predictedTemp} />
+          <Overview last12HoursData={last12Hours} last24HoursData={last24Hours} lastWeekData={lastWeek} last30DaysData={last30Days} hotColdLast30DaysCount={hotColdLast30DaysCount} hotColdLastWeekCount={hotColdLastWeekCount} movingAvgLast30Days={movingAvgLast30Days} />
           <div className="row justify-content-center">
             <h1 className="mt-3 fw-bold text-black">Current Temperature Compared To Previous Years</h1>
             <div className="col-12 mt-3">

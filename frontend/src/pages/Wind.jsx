@@ -5,10 +5,11 @@ import { useWindData } from '../hooks/useWindData.js';
 import LoadingPage from '../components/LoadingPage.jsx';
 import LatestRecordedStats from '../components/wind/LatestRecordedStats.jsx';
 import TotalWindRun from '../components/wind/TotalWindRun.jsx';
+import OverallWindStats from '../components/wind/OverallWindStats.jsx';
 
 const Wind = () => {
 
-    const { loading, latestWind, totalDailyWindRun } = useWindData();
+    const { loading, latestWind, totalDailyWindRun, windiestDay } = useWindData();
 
     if (loading) return (
         <LoadingPage page={"Wind"} />
@@ -19,6 +20,7 @@ const Wind = () => {
             <div className="container text-center">
                 <LatestRecordedStats latestRecord={latestWind} />
                 <TotalWindRun windRunList={totalDailyWindRun} />
+                <OverallWindStats windiestDay={windiestDay} />
             </div>
         </main>
     );

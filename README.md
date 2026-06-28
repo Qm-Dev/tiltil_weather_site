@@ -62,4 +62,4 @@ npm run dev
 ```bash
 uvicorn api:app
 ```
-> Head over to `/docs` to check the list of available endpoints.
+> Head over to `localhost:8000/docs` to check the list of available endpoints.

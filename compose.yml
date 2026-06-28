@@ -2,7 +2,7 @@ services:
   db:
     restart: always
     image: postgres:16-alpine
-    container_name: weather_db
+    container_name: database
     env_file: ./backend/.env.production
     environment:
       TZ: America/Santiago
@@ -23,7 +23,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: weather_api
+    container_name: api
     env_file: ./backend/.env.production
     environment:
       PYTHONUNBUFFERED: 1
@@ -39,7 +39,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: weather_frontend
+    container_name: frontend
     env_file: ./frontend/.env.production
     ports:
       - "5173:5173"

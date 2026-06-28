@@ -30,3 +30,13 @@ def total_daily_wind_run(db: Session = Depends(get_db), asc: bool = False):
     By default, the endpoint returns the records ordered by date in descending order.
     """
     return crud.get_total_daily_wind_run(db, asc)
+
+@router.get("/historic/windiest_days")
+def windiest_days(db: Session = Depends(get_db), days: int = 1):
+    """
+    Returns the windiest days recorded by the weather station.
+    The windiest day is determined by the total 'amount' of wind that passed through the station that day, also known as Wind Run.
+
+    By default, the endpoint returns the windiest day recorded.
+    """
+    return crud.get_windy_days(db, days)
