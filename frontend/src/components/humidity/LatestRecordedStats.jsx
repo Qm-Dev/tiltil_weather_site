@@ -11,13 +11,13 @@ export default function LatestRecordedStats({ latestRecord, latestMaxMin, last24
 
     return (
         <>
-            <div className="row text-center justify-content-center mx-auto gap-3 w-75">
+            <div className="row text-center justify-content-center mx-auto gap-2 w-75">
                 <h1 className="fw-bold text-black mt-3">Latest Recorded Stats</h1>
+                <h2 className="text-black">{parsedDateLatestRecord || "Date is not available."}</h2>
                 <div className="col-12 col-sm-5 border border-2 border-black rounded-3 text-black" style={{backgroundColor: "white"}}>
                     <h2>Outside Humidity</h2>
                     <h2 className="fw-bold">{`${latestRecord.humidity}%` || "Unknown"}</h2>
                     <h2 className="fs-5">Dew Point: {`${latestRecord.dew_point} °C` || "Unknown"}</h2>
-                    <h4>{parsedDateLatestRecord || "Date is not available."}</h4>
                 </div>
             </div>
             <div className="row text-center justify-content-center mx-auto gap-3 w-75 mt-3">
@@ -35,7 +35,7 @@ export default function LatestRecordedStats({ latestRecord, latestMaxMin, last24
                 </div>
                 <h3 className="fw-bold text-black">Relative Humidity Range: {(latestMaxMin?.max_hum && latestMaxMin?.min_hum) ? `${latestMaxMin.max_hum - latestMaxMin.min_hum}%` : "N/A"}</h3>
             </div>
-            <div className="row text-center justify-content-center mx-auto gap-3 w-75 mt-3">
+            <div className="row text-center justify-content-center mx-auto mt-3">
                 <h1 className="fw-bold text-black">Overview</h1>
                     <LastPeriodHoursHumidityChart data={last24Hours} period="Last 24 Hours" />
             </div>
