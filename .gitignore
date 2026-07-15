@@ -23,12 +23,11 @@ node_modules
 dist/
 build/
 
-# CSV
+# Text Files and WLK
 *.csv
-
-# Text Files
 *.txt
 !requirements-dev.txt
+*.wlk
 
 # Executables
 *.exe
