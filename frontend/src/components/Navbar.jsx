@@ -4,7 +4,7 @@ import thermometer from '../assets/thermometer.svg';
 import droplet from '../assets/droplet.svg';
 import rain from '../assets/rain.svg';
 import wind from '../assets/wind.svg';
-import login from '../assets/login.svg';
+import sun from '../assets/sun.svg';
 import dataset from '../assets/dataset.svg';
 
 const Navbar = () => {
@@ -31,6 +31,9 @@ const Navbar = () => {
                         </li>
                         <li className="nav-item">
                             <a className="nav-link text-white" href="/pressure"><img src={pressure} alt="Pressure" style={{ height: '20px', marginRight: '5px' }} /> Pressure</a>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link text-white" href="/solar"><img src={sun} alt="Solar" style={{ height: '20px', marginRight: '5px' }} /> Solar</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link text-white" href="/upload_dataset"><img src={dataset} alt="Dataset" style={{ height: '20px', marginRight: '5px' }} /> Dataset</a>

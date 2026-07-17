@@ -100,46 +100,58 @@ def latest_max_min_temperature(db: Session = Depends(get_db)):
     return crud.get_latest_max_min(db)
 
 @router.get("/frosts")
-def frost_periods(db: Session = Depends(get_db)):
+def frost_periods(db: Session = Depends(get_db), threshold: float = 0):
     """
-    Returns continuous periods of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during those periods.
+    Returns continuous periods of frost (`low_temp <= threshold`) including the start and end dates, duration (seconds), and minimum temperature reached during those periods.
+
+    By default, the `threshold` parameter is set to `0` (degrees Celsius).
     """
-    return crud.get_frosts(db)
+    return crud.get_frosts(db, threshold)
 
 @router.get("/frosts/latest")
-def latest_frost_period(db: Session = Depends(get_db)):
+def latest_frost_period(db: Session = Depends(get_db), threshold: float = 0):
     """
-    Returns the latest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
+    Returns the latest continuous period of frost (`low_temp <= threshold`) including the start and end dates, duration (seconds), and minimum temperature reached during that period.
+
+    By default, the `threshold` parameter is set to `0` (degrees Celsius).
     """
-    return crud.get_latest_frost(db)
+    return crud.get_latest_frost(db, threshold)
 
 @router.get("/frosts/longest")
-def longest_frost_period(db: Session = Depends(get_db)):
+def longest_frost_period(db: Session = Depends(get_db), threshold: float = 0):
     """
-    Returns the longest continuous period of frost (low_temp <= 0) including the start and end dates, duration, and minimum temperature reached during that period.
+    Returns the longest frost (`low_temp <= threshold`) including the start and end dates, duration (seconds), and minimum temperature reached.
+
+    By default, the `threshold` parameter is set to `0` (degrees Celsius).
     """
-    return crud.get_longest_frost(db)
+    return crud.get_longest_frost(db, threshold)
 
 @router.get("/heatwaves")
-def heatwave_periods(db: Session = Depends(get_db)):
+def heatwave_periods(db: Session = Depends(get_db), threshold: float = 30):
     """
-    Returns continuous periods of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during those periods.
+    Returns periods of heatwave (`hi_temp >= threshold`) including the start and end dates, duration (seconds), and maximum temperature reached during those periods.
+
+    By default, the `threshold` parameter is set to `30` (degrees Celsius).
     """
-    return crud.get_heatwaves(db)
+    return crud.get_heatwaves(db, threshold)
 
 @router.get("/heatwaves/latest")
-def latest_heatwave_period(db: Session = Depends(get_db)):
+def latest_heatwave_period(db: Session = Depends(get_db), threshold: float = 30):
     """
-    Returns the latest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
+    Returns the latest heatwave (`hi_temp >= threshold`) including the start and end dates, duration (seconds), and maximum temperature reached during that period.
+
+    By default, the `threshold` parameter is set to `30` (degrees Celsius).
     """
-    return crud.get_latest_heatwave(db)
+    return crud.get_latest_heatwave(db, threshold)
 
 @router.get("/heatwaves/longest")
-def longest_heatwave_period(db: Session = Depends(get_db)):
+def longest_heatwave_period(db: Session = Depends(get_db), threshold: float = 30):
     """
-    Returns the longest continuous period of heatwave (hi_temp >= 25) including the start and end dates, duration, and maximum temperature reached during that period.
+    Returns the longest heatwave (`hi_temp >= threshold`) including the start and end dates, duration (seconds), and maximum temperature reached.
+
+    By default, the `threshold` parameter is set to `30` (degrees Celsius).
     """
-    return crud.get_longest_heatwave(db)
+    return crud.get_longest_heatwave(db, threshold)
 
 @router.get("/hot_cold_days/last_week")
 def hot_cold_days_last_week(db: Session = Depends(get_db)):
@@ -156,9 +168,9 @@ def hot_cold_days_last_30_days(db: Session = Depends(get_db)):
     return crud.get_amount_hot_cold_days_last_30_days(db)
 
 @router.get("/moving_average")
-def temperature_moving_average(db: Session = Depends(get_db)):
+def temperature_moving_average(db: Session = Depends(get_db), window: int = 7):
     """
-    Returns the simple moving average temperature for the last 30 days from the weather records. Window size of 7 days.
-    The moving average is calculated inside the database with the help of Window Functions.
+    Returns the simple moving average temperature for the last 30 days from the weather records. By default, the window size is set at 7 days.
+    The moving average is calculated inside the database with the help of window functions.
     """
-    return crud.get_temperature_moving_avg_7_days(db)
+    return crud.get_temperature_moving_avg(db, window)

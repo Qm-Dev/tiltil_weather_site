@@ -330,9 +330,9 @@ def get_latest_max_min(db: Session):
     return db.execute(query).mappings().first()
 
 
-def get_frosts(db: Session):
+def get_frosts(db: Session, threshold: float = 0):
     """
-    Identifies continuous periods of frost (low_temp < 0) and obtains the start and end dates of those events, the duration and the minimum
+    Identifies continuous periods of frost (`low_temp <= threshold`) and obtains the start and end dates of those events, the duration and the minimum
     temperature reached during that time frame. Only events that lasted 15 minutes or more are included.
     """
     query = text("""
@@ -341,9 +341,9 @@ def get_frosts(db: Session):
                         record_date,
                         low_temp,
                         -- Check if current row is frost
-                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
+                        CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END AS is_frost,
                         -- Check if the PREVIOUS row was frost
-                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        LAG(CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -372,19 +372,19 @@ def get_frosts(db: Session):
                 HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
                 ORDER BY frost_start ASC;
                 """)
-    return db.execute(query).mappings().all()
+    return db.execute(query, {"threshold": threshold}).mappings().all()
 
 
-def get_latest_frost(db: Session):
+def get_latest_frost(db: Session, threshold: float = 0):
     query = text("""
                 WITH frost_markers AS (
                     SELECT 
                         record_date,
                         low_temp,
-                        -- Check if current row meets frost threshold
-                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
-                        -- Check if the PREVIOUS row was in a frost
-                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        -- Check if current row is frost
+                        CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END AS is_frost,
+                        -- Check if the PREVIOUS row was frost
+                        LAG(CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -393,8 +393,8 @@ def get_latest_frost(db: Session):
                     SELECT 
                         *,
                         -- Increment group ID if:
-                        -- 1. Status changed (frost -> no frost or vice versa)
-                        -- 2. OR there is a data gap larger than 1 hour
+                        -- 1. Status changed (frost to no-frost)
+                        -- 2. OR the gap between timestamps is > 1 hour
                         SUM(CASE 
                             WHEN is_frost != prev_is_frost THEN 1 
                             WHEN record_date - prev_date > INTERVAL '1 hour' THEN 1
@@ -414,19 +414,19 @@ def get_latest_frost(db: Session):
                 ORDER BY frost_start DESC
                 LIMIT 1;
                 """)
-    return db.execute(query).mappings().first()
+    return db.execute(query, {"threshold": threshold}).mappings().first()
 
 
-def get_longest_frost(db: Session):
+def get_longest_frost(db: Session, threshold: float = 0):
     query = text("""
                 WITH frost_markers AS (
                     SELECT 
                         record_date,
                         low_temp,
                         -- Check if current row is frost
-                        CASE WHEN low_temp < 0 THEN 1 ELSE 0 END AS is_frost,
+                        CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END AS is_frost,
                         -- Check if the PREVIOUS row was frost
-                        LAG(CASE WHEN low_temp < 0 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
+                        LAG(CASE WHEN low_temp <= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_frost,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -456,19 +456,19 @@ def get_longest_frost(db: Session):
                 ORDER BY duration DESC
                 LIMIT 1;
                  """)
-    return db.execute(query).mappings().first()
+    return db.execute(query, {"threshold": threshold}).mappings().first()
 
 
-def get_heatwaves(db: Session):
+def get_heatwaves(db: Session, threshold: float = 30):
     query = text("""
                 WITH heat_markers AS (
                     SELECT 
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -497,19 +497,19 @@ def get_heatwaves(db: Session):
                 HAVING MAX(record_date) - MIN(record_date) >= INTERVAL '15 minutes'
                 ORDER BY heatwave_start ASC;
                 """)
-    return db.execute(query).mappings().all()
+    return db.execute(query, {"threshold": threshold}).mappings().all()
 
 
-def get_latest_heatwave(db: Session):
+def get_latest_heatwave(db: Session, threshold: float = 30):
     query = text("""
                 WITH heat_markers AS (
                     SELECT 
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -539,19 +539,19 @@ def get_latest_heatwave(db: Session):
                 ORDER BY heatwave_start DESC
                 LIMIT 1;
                 """)
-    return db.execute(query).mappings().first()
+    return db.execute(query, {"threshold": threshold}).mappings().first()
 
 
-def get_longest_heatwave(db: Session):
+def get_longest_heatwave(db: Session, threshold: float = 30):
     query = text("""
                 WITH heat_markers AS (
                     SELECT 
                         record_date,
                         hi_temp,
                         -- Check if current row meets heatwave threshold
-                        CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END AS is_heatwave,
+                        CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END AS is_heatwave,
                         -- Check if the PREVIOUS row was in a heatwave
-                        LAG(CASE WHEN hi_temp >= 33 THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
+                        LAG(CASE WHEN hi_temp >= :threshold THEN 1 ELSE 0 END) OVER (ORDER BY record_date) AS prev_is_heatwave,
                         -- Check the time gap between rows
                         LAG(record_date) OVER (ORDER BY record_date) AS prev_date
                     FROM weather
@@ -581,10 +581,13 @@ def get_longest_heatwave(db: Session):
                 ORDER BY duration DESC
                 LIMIT 1;
                 """)
-    return db.execute(query).mappings().first()
+    return db.execute(query, {"threshold": threshold}).mappings().first()
 
 
-def get_temperature_moving_avg_7_days(db: Session):
+def get_temperature_moving_avg(db: Session, window: int = 7):
+    if window <= 0:
+        window = 7
+    window -= 1
     query = text("""
                 WITH last_30_days_stats AS (
                     SELECT
@@ -593,7 +596,7 @@ def get_temperature_moving_avg_7_days(db: Session):
                         ROUND(
                             AVG(AVG(avg_temp)) OVER (
                                 ORDER BY DATE(record_date)
-                                ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+                                ROWS BETWEEN :window PRECEDING AND CURRENT ROW
                             )::NUMERIC,1) AS moving_avg
                     FROM
                         weather
@@ -608,4 +611,4 @@ def get_temperature_moving_avg_7_days(db: Session):
                 FROM last_30_days_stats
                 ORDER BY date ASC
                 """)
-    return db.execute(query).mappings().all()
+    return db.execute(query, {"window": window}).mappings().all()

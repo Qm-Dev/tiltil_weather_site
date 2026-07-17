@@ -3,3 +3,4 @@ from .rain import *
 from .humidity import *
 from .wind import *
 from .pressure import *
+from .solar import *

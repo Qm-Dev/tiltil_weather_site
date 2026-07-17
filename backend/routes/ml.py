@@ -17,6 +17,9 @@ def get_db():
 
 @router.get("/avg_temp_pred")
 def average_temperature_prediction(request: Request, db: Session = Depends(get_db)):
+    """
+    Perform a prediction for the average temperature in the next 15 minutes from the latest record available.
+    """
     model = getattr(request.app.state, "temp_predictor", None)
     
     if not model:

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from routes import dataset, temperature, rainfall, humidity, wind, pressure, ml
+from routes import dataset, temperature, rainfall, humidity, wind, pressure, solar, ml
 
 tags_metadata = [
     {"name": "📄 WeatherLink Dataset", "description": "Operations related to the WeatherLink historical dataset."},
@@ -12,6 +12,7 @@ tags_metadata = [
     {"name": "💧 Humidity & Dew Point", "description": "Operations related to humidity and dew point data."},
     {"name": "💨 Wind", "description": "Operations related to wind data."},
     {"name": "📈 Pressure", "description": "Operations related to pressure data."},
+    {"name": "☀️ Solar", "description": "Operations related to solar data."},
     {"name": "🤖 Machine Learning", "description": "Operations related to predictions with classic Machine Learning techniques."}
 ]
 
@@ -57,6 +58,7 @@ app.include_router(rainfall.router)
 app.include_router(humidity.router)
 app.include_router(wind.router)
 app.include_router(pressure.router)
+app.include_router(solar.router)
 app.include_router(ml.router)
 
 @app.get("/", include_in_schema=False)
