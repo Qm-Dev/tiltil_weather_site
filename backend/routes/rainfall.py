@@ -1,19 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from db.database import SessionLocal
+from db.database import get_db
 from db import crud
 
 router = APIRouter(
     prefix="/rainfall",
     tags=["🌧️ Rainfall"]
 )
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.get("/historic/yearly")
 def historical_rainfall_by_year(db: Session = Depends(get_db)):

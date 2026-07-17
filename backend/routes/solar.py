@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from db.database import SessionLocal
+from db.database import get_db
 from db import crud
 from datetime import date
 
@@ -8,13 +8,6 @@ router = APIRouter(
     prefix="/solar",
     tags=["☀️ Solar"]
 )
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.get("/latest")
 def latest_solar_records(db: Session = Depends(get_db), record_amount: int = 1):

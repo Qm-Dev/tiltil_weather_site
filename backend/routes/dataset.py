@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from db.database import SessionLocal
+from db.database import get_db
 from scripts.extract import extract_from_csv
 from scripts.transform import clean_weather_data
 from scripts.load import load_to_postgres
@@ -11,13 +11,6 @@ router = APIRouter(
     prefix="/weatherlink_dataset",
     tags=["📄 WeatherLink Dataset"]
 )
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/db_import_weather_records")
 async def import_weather_records(db: Session = Depends(get_db), records_file: UploadFile = File(...)):
