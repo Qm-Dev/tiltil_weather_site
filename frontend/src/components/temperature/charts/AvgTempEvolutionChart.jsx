@@ -1,6 +1,11 @@
 import LineChart from "../../LineChart";
 
 export default function AvgTempEvolutionChart({data, x_label}) {
+
+    if (!data.labels?.length) {
+        return <h3 className="text-black">Avg. temperature evolution chart is currently unavailable.</h3>
+    }
+
     return (
         <LineChart
         labels={data.labels}

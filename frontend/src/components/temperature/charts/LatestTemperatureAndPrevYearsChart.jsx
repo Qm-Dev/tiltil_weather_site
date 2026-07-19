@@ -1,6 +1,11 @@
 import LineChart from "../../LineChart";
 
 export default function LatestTemperatureAndPrevYearsChart({data}) {
+
+    if (!data.labels?.length) {
+        return <h3 className="text-black">Current temperature and previous years comparison chart is currently unavailable.</h3>
+    }
+
     return (
     <LineChart
     labels={data.labels}

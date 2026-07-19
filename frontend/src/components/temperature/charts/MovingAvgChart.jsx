@@ -1,6 +1,11 @@
 import LineChart from "../../LineChart";
 
 export default function MovingAvgChart({data}) {
+
+    if (!data.labels?.length) {
+        return <h3 className="text-black">Temp. moving average chart is currently unavailable.</h3>
+    }
+
     return (
     <LineChart
     labels={data.labels}

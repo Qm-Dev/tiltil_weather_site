@@ -1,6 +1,11 @@
 import LineChart from "../../LineChart";
 
 export default function LastPeriodDaysTemperatureChart({data, period}) {
+
+    if (!data.labels?.length) {
+        return <h3 className="text-black">Last period (days) temperature chart is currently unavailable.</h3>
+    }
+
     return (
     <LineChart
     labels={data.labels}
