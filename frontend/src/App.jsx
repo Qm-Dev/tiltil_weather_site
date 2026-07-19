@@ -12,6 +12,7 @@ import Humidity from './pages/Humidity.jsx';
 import Rainfall from './pages/Rainfall.jsx';
 import Wind from './pages/Wind.jsx';
 import Pressure from './pages/Pressure.jsx';
+import Solar from './pages/Solar.jsx'
 import UploadDataset from './pages/UploadDataset.jsx';
 
 const NavbarLayout = () => {
@@ -34,11 +35,12 @@ function App() {
           <Route path="/rain" element={<Rainfall />} />
           <Route path="/wind" element={<Wind />} />
           <Route path="/pressure" element={<Pressure />} />
+          <Route path="/solar" element={<Solar />} />
           <Route path="/upload_dataset" element={<UploadDataset />} />
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App
