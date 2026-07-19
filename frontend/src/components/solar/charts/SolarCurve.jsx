@@ -13,7 +13,7 @@ export default function SolarCurve({data}) {
         })}
         datasets={[
             {
-            label: "Solar Radiation (W/m2)",
+            label: "W/m\u00B2",
             borderColor: "rgba(0, 0, 0, 0.8)",
             borderWidth: 2.25,
             backgroundColor: "rgb(255, 230, 10)",
@@ -23,7 +23,7 @@ export default function SolarCurve({data}) {
         ]}
         title={`Sunlight (${data.labels[0].split('T')[0]})`}
         x_label="Time (HH:MM:SS)"
-        y_label="Solar Radiation"
+        y_label="Solar Radiation (Watts per meter squared)"
         is_animated={true}
         />
     );
