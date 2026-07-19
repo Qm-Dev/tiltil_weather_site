@@ -7,18 +7,24 @@ const Solar = () => {
     const { loading, sunlight } = useSolarData();
 
     if (loading) return (
-        <LoadingPage page={"Solar"} />
+        <>
+            <title>Til-Til Weather Site | Solar</title>
+            <LoadingPage page={"Solar"} />
+        </>
     )
 
     return (
-        <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
-            <div className="container text-center">
-                <div className="row justify-content-center mx-auto">
-                    <h1 className="text-black fw-bold mt-3">Solar Curve</h1>
-                    <SolarCurve data={sunlight} />
+        <>
+            <title>Til-Til Weather Site | Solar</title>
+            <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
+                <div className="container text-center">
+                    <div className="row justify-content-center mx-auto">
+                        <h1 className="text-black fw-bold mt-3">Solar Curve</h1>
+                        <SolarCurve data={sunlight} />
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </>
     );
 }
 export default Solar;

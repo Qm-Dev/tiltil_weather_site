@@ -11,16 +11,22 @@ const Humidity = () => {
     const { loading, yearly, monthly, daily, last24Hours, latestRecord, latestMaxMin } = useHumidityData();
 
     if (loading) return (
-        <LoadingPage page={"Humidity"} />
+        <>
+            <title>Til-Til Weather Site | Humidity</title>
+            <LoadingPage page={"Humidity"} />
+        </>
     )
 
     return (
-        <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
-            <div className="container text-center justify-content-center">
-                <LatestRecordedStats latestRecord={latestRecord} latestMaxMin={latestMaxMin} last24Hours={last24Hours} />
-                <HumidityEvolution yearly_data={yearly} monthly_data={monthly} daily_data={daily} />
-            </div>
-        </main>
+        <>
+            <title>Til-Til Weather Site | Humidity</title>
+            <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
+                <div className="container text-center justify-content-center">
+                    <LatestRecordedStats latestRecord={latestRecord} latestMaxMin={latestMaxMin} last24Hours={last24Hours} />
+                    <HumidityEvolution yearly_data={yearly} monthly_data={monthly} daily_data={daily} />
+                </div>
+            </main>
+        </>
     );
 }
 export default Humidity;

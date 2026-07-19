@@ -10,17 +10,23 @@ const Rainfall = () => {
     const { loading, yearly, monthly } = useRainfallData();
 
     if (loading) return (
-        <LoadingPage page={"Rainfall"} />
+        <>
+            <title>Til-Til Weather Site | Rain</title>
+            <LoadingPage page={"Rainfall"} />
+        </>
     )
 
     return (
-        <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
-            <div className="container text-center">
-                <div className="row justify-content-center w-75 gap-3 mx-auto">
-                    <HistoricRainfall yearly={yearly} monthly={monthly} />
+        <>
+            <title>Til-Til Weather Site | Rain</title>
+            <main style={{backgroundColor: "#A6D0F2", minHeight: "100vh"}}>
+                <div className="container text-center">
+                    <div className="row justify-content-center w-75 gap-3 mx-auto">
+                        <HistoricRainfall yearly={yearly} monthly={monthly} />
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </>
     );
 }
 export default Rainfall;
