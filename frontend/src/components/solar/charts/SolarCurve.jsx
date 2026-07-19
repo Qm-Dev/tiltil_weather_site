@@ -2,7 +2,7 @@ import LineChart from "../../LineChart";
 
 export default function SolarCurve({data}) {
 
-    if ((data?.length ?? 0) === 0) {
+    if (!data.labels?.length) {
         return <h3 className="text-black">Solar curve chart is currently unavailable.</h3>
     }
 
